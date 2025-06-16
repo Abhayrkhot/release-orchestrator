@@ -1,0 +1,353 @@
+{
+  "passed": 25,
+  "ran_at": "2025-06-16T03:20:55Z",
+  "recovery_seconds": {
+    "max": 34.7,
+    "min": 2.1,
+    "n": 15,
+    "p50": 18.4,
+    "p95": 27.5
+  },
+  "rollback_seconds": {
+    "max": 21.3,
+    "min": 0.6,
+    "n": 13,
+    "p50": 6.2,
+    "p95": 18.3
+  },
+  "scenarios": [
+    {
+      "id": "R01",
+      "name": "New catalog-api version crashes on start",
+      "passed": true,
+      "outcome": "rolled_back",
+      "release": "1.1.8",
+      "rollback_seconds": 5.7,
+      "recovery_seconds": 7.3,
+      "seconds": 9.2,
+      "notes": [
+        "failure: task catalog-api on node3 restarted: Terminated: Exit Code: 3, Exit Message: \"Docker container exited with non-zero exit code: 3\"",
+        "rollback 5.7s after detection, 7.3s after the bad rollout began"
+      ]
+    },
+    {
+      "id": "R02",
+      "name": "New version runs but never passes its health check",
+      "passed": true,
+      "outcome": "rolled_back",
+      "release": "1.1.8",
+      "rollback_seconds": 6.2,
+      "recovery_seconds": 27.5,
+      "seconds": 29.5,
+      "notes": [
+        "failure: allocation ba4826ae on node3 marked unhealthy: Alloc Unhealthy: Task not running for min_healthy_time of 3s by healthy_deadline of 20s",
+        "rollback 6.2s after detection, 27.5s after the bad rollout began"
+      ]
+    },
+    {
+      "id": "R03",
+      "name": "New version starts slower than the health deadline",
+      "passed": true,
+      "outcome": "rolled_back",
+      "release": "1.1.8",
+      "rollback_seconds": 5.2,
+      "recovery_seconds": 25.8,
+      "seconds": 27.7,
+      "notes": [
+        "failure: allocation 885889af on node3 marked unhealthy: Alloc Unhealthy: Task not running for min_healthy_time of 3s by healthy_deadline of 20s",
+        "rollback 5.2s after detection, 25.8s after the bad rollout began"
+      ]
+    },
+    {
+      "id": "R04",
+      "name": "New version passes checks, then crashes mid-rollout",
+      "passed": true,
+      "outcome": "rolled_back",
+      "release": "1.1.8",
+      "rollback_seconds": 5.8,
+      "recovery_seconds": 14.6,
+      "seconds": 16.4,
+      "notes": [
+        "failure: task catalog-api on node3 restarted: Terminated: Exit Code: 5, Exit Message: \"Docker container exited with non-zero exit code: 5\"",
+        "rollback 5.8s after detection, 14.6s after the bad rollout began"
+      ]
+    },
+    {
+      "id": "R05",
+      "name": "New version exceeds its memory limit and is OOM-killed",
+      "passed": true,
+      "outcome": "rolled_back",
+      "release": "1.1.8",
+      "rollback_seconds": 5.2,
+      "recovery_seconds": 6.8,
+      "seconds": 8.7,
+      "notes": [
+        "failure: task catalog-api on node3 restarted: Terminated: Exit Code: 137, Exit Message: \"OOM Killed\"",
+        "rollback 5.2s after detection, 6.8s after the bad rollout began"
+      ]
+    },
+    {
+      "id": "R06",
+      "name": "Binary refuses the live schema although its manifest accepts it",
+      "passed": true,
+      "outcome": "rolled_back",
+      "release": "1.1.8",
+      "rollback_seconds": 13.6,
+      "recovery_seconds": 15.1,
+      "seconds": 34.8,
+      "notes": [
+        "failure: task edge-gateway on node3 restarted: Terminated: Exit Code: 1, Exit Message: \"Docker container exited with non-zero exit code: 1\"",
+        "rollback 13.6s after detection, 15.1s after the bad rollout began"
+      ]
+    },
+    {
+      "id": "R07",
+      "name": "New version fails on one node only (partial failure)",
+      "passed": true,
+      "outcome": "rolled_back",
+      "release": "1.1.8",
+      "rollback_seconds": 5.8,
+      "recovery_seconds": 13.6,
+      "seconds": 16.1,
+      "notes": [
+        "failure: task catalog-api on node2 restarted: Terminated: Exit Code: 3, Exit Message: \"Docker container exited with non-zero exit code: 3\"",
+        "rollback 5.8s after detection, 13.6s after the bad rollout began",
+        "allocations already upgraded on other nodes were reverted too"
+      ]
+    },
+    {
+      "id": "R08",
+      "name": "Last service in dependency order fails; all three roll back in reverse",
+      "passed": true,
+      "outcome": "rolled_back",
+      "release": "1.1.8",
+      "rollback_seconds": 21.3,
+      "recovery_seconds": 22.9,
+      "seconds": 63.8,
+      "notes": [
+        "failure: task order-worker on node3 restarted: Terminated: Exit Code: 3, Exit Message: \"Docker container exited with non-zero exit code: 3\"",
+        "rollback 21.3s after detection, 22.9s after the bad rollout began",
+        "rollback order [order-worker edge-gateway catalog-api]"
+      ]
+    },
+    {
+      "id": "R09",
+      "name": "Middle service fails; services after it are never touched",
+      "passed": true,
+      "outcome": "rolled_back",
+      "release": "1.1.8",
+      "rollback_seconds": 13.6,
+      "recovery_seconds": 34.7,
+      "seconds": 56,
+      "notes": [
+        "failure: allocation 3945854b on node3 marked unhealthy: Alloc Unhealthy: Task not running for min_healthy_time of 3s by healthy_deadline of 20s",
+        "rollback 13.6s after detection, 34.7s after the bad rollout began",
+        "order-worker job version unchanged at 16"
+      ]
+    },
+    {
+      "id": "R10",
+      "name": "Image deleted from the registry after preflight, before its service rolls out",
+      "passed": true,
+      "outcome": "rolled_back",
+      "release": "1.1.10",
+      "rollback_seconds": 16.8,
+      "recovery_seconds": 18.4,
+      "seconds": 44.3,
+      "notes": [
+        "deleted edge-gateway@ae75fe7e4c30 while catalog-api was rolling out",
+        "failure: task edge-gateway on node3 restarted: Driver Failure: Failed to pull `registry:5000/edge-gateway@sha256:ae75fe7e4c300c99c3755bb42d0be15da9b737aa64e2f60dfe1b66b6f78d2ac4`: Error response from daemon: failed to resolve reference \"registry:5000/edge-gateway@sha256:ae75fe7e4c300c99c3755bb42d0be15da9b737aa64e2f60dfe1b66b6f78d2ac4\": registry:5000/edge-gateway@sha256:ae75fe7e4c300c99c3755bb42d0be15da9b737aa64e2f60dfe1b66b6f78d2ac4: not found",
+        "rollback 16.8s after detection, 18.4s after the bad rollout began"
+      ]
+    },
+    {
+      "id": "R11",
+      "name": "Registry goes down mid-rollout; rollback works from node image caches",
+      "passed": true,
+      "outcome": "rolled_back",
+      "release": "1.1.10",
+      "rollback_seconds": 10.5,
+      "recovery_seconds": 19.4,
+      "seconds": 22.8,
+      "notes": [
+        "registry stopped 0.5s into the catalog-api rollout",
+        "rolled back: task catalog-api on node2 restarted: Driver Failure: Failed to pull `registry:5000/catalog-api@sha256:0a95a79c852158dd999f480311661c14dc23be0470f78d8072c87b82c025407b`: Error response from daemon: failed to resolve reference \"registry:5000/catalog-api@sha256:0a95a79c852158dd999f480311661c14dc23be0470f78d8072c87b82c025407b\": failed to do request: Head \"https://registry:5000/v2/catalog-api/manifests/sha256:0a95a79c852158dd999f480311661c14dc23be0470f78d8072c87b82c025407b\": dial tcp: lookup registry on 127.0.0.11:53: server misbehaving",
+        "rollback 10.5s after detection, 19.4s after the bad rollout began, registry still down"
+      ]
+    },
+    {
+      "id": "R12",
+      "name": "A node dies mid-rollout",
+      "passed": true,
+      "outcome": "succeeded",
+      "release": "1.1.10",
+      "seconds": 78.2,
+      "notes": [
+        "node3 killed during the catalog-api rollout",
+        "release completed on the two remaining nodes",
+        "all 9 allocations healthy on node1 and node2 with node3 down"
+      ]
+    },
+    {
+      "id": "R13",
+      "name": "A node is drained mid-rollout",
+      "passed": true,
+      "outcome": "succeeded",
+      "release": "1.1.11",
+      "seconds": 63.7,
+      "notes": [
+        "node2 drained during the catalog-api rollout",
+        "deploy succeeded",
+        "converged on 1.1.11 with node2 drained"
+      ]
+    },
+    {
+      "id": "R14",
+      "name": "Nomad server restarts mid-rollout",
+      "passed": true,
+      "outcome": "succeeded",
+      "release": "1.1.12",
+      "seconds": 70.2,
+      "notes": [
+        "Nomad server restarted during the catalog-api rollout",
+        "deploy succeeded"
+      ]
+    },
+    {
+      "id": "R15",
+      "name": "MySQL restarts mid-rollout",
+      "passed": true,
+      "outcome": "succeeded",
+      "release": "1.1.13",
+      "seconds": 56.3,
+      "notes": [
+        "MySQL restarted during the catalog-api rollout",
+        "deploy succeeded"
+      ]
+    },
+    {
+      "id": "R16",
+      "name": "Controller killed mid-rollout; reconcile restores the last good release",
+      "passed": true,
+      "outcome": "reconciled",
+      "recovery_seconds": 25.9,
+      "seconds": 49.4,
+      "notes": [
+        "controller SIGKILLed during the edge-gateway rollout (catalog-api already upgraded)",
+        "a new deploy was refused (locked)",
+        "reconcile restored 1.1.13 25.9s after it was started (including waiting out the 15s lease)",
+        "interrupted release marked \"reconciled\""
+      ]
+    },
+    {
+      "id": "R17",
+      "name": "Controller killed while rolling back; reconcile finishes the job",
+      "passed": true,
+      "outcome": "reconciled",
+      "recovery_seconds": 21.5,
+      "seconds": 43.9,
+      "notes": [
+        "controller SIGKILLed as soon as it started rolling back",
+        "back on 1.1.13 21.8s after reconcile started"
+      ]
+    },
+    {
+      "id": "R18",
+      "name": "Two controllers deploy at once; the lock admits one",
+      "passed": true,
+      "outcome": "succeeded",
+      "release": "1.1.14",
+      "seconds": 20.6,
+      "notes": [
+        "second deploy refused: another release holds the deploy lock (owner 401dadce0ecc/34678/e89bb660)"
+      ]
+    },
+    {
+      "id": "R19",
+      "name": "Migration fails half way; release aborts before any service changes, then repair",
+      "passed": true,
+      "outcome": "aborted",
+      "release": "1.1.15",
+      "seconds": 60.1,
+      "notes": [
+        "aborted: migration: migration 5 create_audit_log failed, schema left dirty: Error 1067 (42000): Invalid default value for 'broken'",
+        "no service job changed",
+        "next deploy blocked by [PF10 PF12]",
+        "operator dropped the half-created table and ran `relctl migrate repair --version 5 --drop`",
+        "1.1.15 deployed after repair (previous good release was 1.1.14)"
+      ]
+    },
+    {
+      "id": "R20",
+      "name": "A brand-new service fails its first deploy; it is removed, the rest untouched",
+      "passed": true,
+      "outcome": "rolled_back",
+      "release": "1.1.16",
+      "rollback_seconds": 0.6,
+      "recovery_seconds": 2.1,
+      "seconds": 4.1,
+      "notes": [
+        "failure: task report-worker on node2 restarted: Terminated: Exit Code: 3, Exit Message: \"Docker container exited with non-zero exit code: 3\"",
+        "rollback 0.6s after detection, 2.1s after the bad rollout began",
+        "report-worker stopped; no other service touched"
+      ]
+    },
+    {
+      "id": "R21",
+      "name": "Operator rolls back a release that deployed fine",
+      "passed": true,
+      "outcome": "succeeded",
+      "release": "1.1.15",
+      "rollback_seconds": 18.3,
+      "seconds": 76.2,
+      "notes": [
+        "all three services back on 1.1.15 in 18.3s"
+      ]
+    },
+    {
+      "id": "R22",
+      "name": "Rolling back to the release already running changes nothing",
+      "passed": true,
+      "outcome": "noop",
+      "seconds": 0.5,
+      "notes": [
+        "two `rollback --to 1.1.15` calls were no-ops; no job version changed"
+      ]
+    },
+    {
+      "id": "R23",
+      "name": "All three nodes restart at once; dependents become ready only after catalog-api",
+      "passed": true,
+      "outcome": "recovered",
+      "recovery_seconds": 16.1,
+      "seconds": 18.8,
+      "notes": [
+        "all services healthy and verified 16s after the restart, without operator action",
+        "first catalog-api ready 03:26:31.024; first of 6 dependents ready 03:26:32.639"
+      ]
+    },
+    {
+      "id": "R24",
+      "name": "catalog-api briefly unavailable during an order-worker rollout; no false rollback",
+      "passed": true,
+      "outcome": "succeeded",
+      "release": "1.1.9",
+      "seconds": 28.1,
+      "notes": [
+        "all 3 catalog-api instances failing health checks for 6s"
+      ]
+    },
+    {
+      "id": "R25",
+      "name": "Dependents roll out only after catalog-api is healthy",
+      "passed": true,
+      "outcome": "succeeded",
+      "release": "1.1.8",
+      "seconds": 60.2,
+      "notes": [
+        "all 6 dependent instances started after catalog-api was healthy at 03:25:38.281"
+      ]
+    }
+  ],
+  "total": 25
+}

@@ -1,0 +1,66 @@
+{
+  "arch": "amd64",
+  "go": "1.27.3",
+  "source_date_epoch": 0,
+  "builders": [
+    "node1",
+    "node2",
+    "node3",
+    "host"
+  ],
+  "identical": true,
+  "artifacts": [
+    {
+      "sha256": "94578b053ae7896590dc5e6848391058b88a35b5ebd390ec7ac852982f4f6c45",
+      "name": "bin/catalog-api-1.0.0"
+    },
+    {
+      "sha256": "ebbd95999011d892d79013ab728adf957d228ba450cca70ca5ba8d177115c261",
+      "name": "bin/catalog-api-1.1.0"
+    },
+    {
+      "sha256": "5ebe6cf744c184c5eee06f457757c0bca32154de6fd2da1a93160261f9305db2",
+      "name": "bin/edge-gateway-1.0.0"
+    },
+    {
+      "sha256": "9cb0e3274a48c451e620b48917d13b34cc3f1dd03145fb323d49b5970be7b088",
+      "name": "bin/edge-gateway-1.1.0"
+    },
+    {
+      "sha256": "d2a912d9c5cdcaa15990424216af4fa042c62e83380b54ac8296ef6529836aa3",
+      "name": "bin/order-worker-1.0.0"
+    },
+    {
+      "sha256": "c7076f57e04afe0dbcc959a3482ea3cd754293b2e8a6e6b045e9aceef45c6a3e",
+      "name": "bin/order-worker-1.1.0"
+    },
+    {
+      "sha256": "4b78ae15dc0450d2828dab3fdc208eeb2198eb0f0e823f83fe0772f238630083",
+      "name": "bin/relctl"
+    },
+    {
+      "sha256": "57119cc771614188bb20aa22c102f39bcfa6521e6b473451175767d2daec2123",
+      "name": "image:catalog-api:1.0.0"
+    },
+    {
+      "sha256": "3dcdad015df10411b5118905f967018e4ad990135b817618917080b02622582f",
+      "name": "image:catalog-api:1.1.0"
+    },
+    {
+      "sha256": "d9890175e83025619649513aa5dcc5bd862a1300b5e8a7873627c605685ce85d",
+      "name": "image:edge-gateway:1.0.0"
+    },
+    {
+      "sha256": "9138e1f03abcfdf54445f2da43017bebcac1202afd4a6e38e10095e2b7524ddf",
+      "name": "image:edge-gateway:1.1.0"
+    },
+    {
+      "sha256": "9218b1aa5e0d575e969270efe4338c5b369ddf63dfcbcab7340636803797008a",
+      "name": "image:order-worker:1.0.0"
+    },
+    {
+      "sha256": "eb48c2bef299edda83e236c35f8de4a6d3f4c623f9dd2a7f582c357d405b7f97",
+      "name": "image:order-worker:1.1.0"
+    }
+  ]
+}

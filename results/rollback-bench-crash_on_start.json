@@ -1,0 +1,89 @@
+{
+  "mode": "crash_on_start",
+  "runs": [
+    {
+      "run": 1,
+      "status": "rolled_back",
+      "reason": "task catalog-api on node2 restarted: Terminated: Exit Code: 3, Exit Message: \"Docker container exited with non-zero exit code: 3\"",
+      "rollback_seconds": 5.593188593,
+      "recovery_seconds": 6.612489663
+    },
+    {
+      "run": 2,
+      "status": "rolled_back",
+      "reason": "task catalog-api on node2 restarted: Terminated: Exit Code: 3, Exit Message: \"Docker container exited with non-zero exit code: 3\"",
+      "rollback_seconds": 5.597474844,
+      "recovery_seconds": 6.621629638
+    },
+    {
+      "run": 3,
+      "status": "rolled_back",
+      "reason": "task catalog-api on node2 restarted: Terminated: Exit Code: 3, Exit Message: \"Docker container exited with non-zero exit code: 3\"",
+      "rollback_seconds": 6.11539357,
+      "recovery_seconds": 7.137546325
+    },
+    {
+      "run": 4,
+      "status": "rolled_back",
+      "reason": "task catalog-api on node2 restarted: Terminated: Exit Code: 3, Exit Message: \"Docker container exited with non-zero exit code: 3\"",
+      "rollback_seconds": 5.5955702,
+      "recovery_seconds": 6.619719395
+    },
+    {
+      "run": 5,
+      "status": "rolled_back",
+      "reason": "task catalog-api on node2 restarted: Terminated: Exit Code: 3, Exit Message: \"Docker container exited with non-zero exit code: 3\"",
+      "rollback_seconds": 5.6155382750000005,
+      "recovery_seconds": 6.635021655
+    },
+    {
+      "run": 6,
+      "status": "rolled_back",
+      "reason": "task catalog-api on node2 restarted: Terminated: Exit Code: 3, Exit Message: \"Docker container exited with non-zero exit code: 3\"",
+      "rollback_seconds": 5.609504481,
+      "recovery_seconds": 6.627993955
+    },
+    {
+      "run": 7,
+      "status": "rolled_back",
+      "reason": "task catalog-api on node2 restarted: Terminated: Exit Code: 3, Exit Message: \"Docker container exited with non-zero exit code: 3\"",
+      "rollback_seconds": 5.102040666,
+      "recovery_seconds": 6.124397776
+    },
+    {
+      "run": 8,
+      "status": "rolled_back",
+      "reason": "task catalog-api on node2 restarted: Terminated: Exit Code: 3, Exit Message: \"Docker container exited with non-zero exit code: 3\"",
+      "rollback_seconds": 5.106286748,
+      "recovery_seconds": 6.130688384
+    },
+    {
+      "run": 9,
+      "status": "rolled_back",
+      "reason": "task catalog-api on node2 restarted: Terminated: Exit Code: 3, Exit Message: \"Docker container exited with non-zero exit code: 3\"",
+      "rollback_seconds": 5.611380813,
+      "recovery_seconds": 6.633531511
+    },
+    {
+      "run": 10,
+      "status": "rolled_back",
+      "reason": "task catalog-api on node2 restarted: Terminated: Exit Code: 3, Exit Message: \"Docker container exited with non-zero exit code: 3\"",
+      "rollback_seconds": 5.619856725,
+      "recovery_seconds": 6.646008168
+    }
+  ],
+  "rollback_seconds": {
+    "n": 10,
+    "min": 5.1,
+    "p50": 5.6,
+    "p95": 6.1,
+    "max": 6.1
+  },
+  "recovery_seconds": {
+    "n": 10,
+    "min": 6.1,
+    "p50": 6.6,
+    "p95": 7.1,
+    "max": 7.1
+  }
+}

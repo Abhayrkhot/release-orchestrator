@@ -1,0 +1,167 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      recovery:
+        description: Also run the recovery scenarios (about 30 minutes)
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: gofmt
+        run: test -z "$(gofmt -l .)" || { gofmt -l .; exit 1; }
+      - run: go vet ./... && go vet -tags integration ./test/integration
+      - run: go test -race ./...
+      - name: shellcheck
+        run: shellcheck -s bash -x preflight/run.sh preflight/lib.sh preflight/checks/*.sh test/faults/*.sh scripts/*.sh
+
+  # The same commit built on three separate Linux runners (two Ubuntu
+  # releases, two CPU architectures) must produce byte-identical binaries and
+  # image digests for both target architectures.
+  reproducible-build:
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-24.04, ubuntu-22.04, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: build
+        run: |
+          export SOURCE_DATE_EPOCH=$(git log -1 --format=%ct)
+          for arch in amd64 arm64; do
+            scripts/build.sh "$arch" "out/$arch"
+            sed "s#  #  linux-$arch/#" "out/$arch/SHA256SUMS" >> SHA256SUMS
+          done
+          echo "runner: $(uname -sm), $(. /etc/os-release && echo "$PRETTY_NAME")" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"; cat SHA256SUMS >> "$GITHUB_STEP_SUMMARY"; echo '```' >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sums-${{ matrix.runner }}
+          path: SHA256SUMS
+      - uses: actions/upload-artifact@v4
+        if: matrix.runner == 'ubuntu-24.04'
+        with:
+          name: build
+          path: out/
+
+  # Compare the three builds, then create, sign and verify the release
+  # manifest and check every checksum in it against the builds.
+  signed-manifest:
+    needs: reproducible-build
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: sums-*
+          path: sums
+      - uses: actions/download-artifact@v4
+        with:
+          name: build
+          path: out
+      - name: builds are identical across runners
+        run: |
+          ls sums
+          ref=sums/sums-ubuntu-24.04/SHA256SUMS
+          for f in sums/*/SHA256SUMS; do
+            diff -u "$ref" "$f" || { echo "::error::$f differs from $ref"; exit 1; }
+          done
+          echo "$(wc -l < "$ref") artifacts identical on $(ls sums | wc -l) runners"
+      - name: signing key
+        env:
+          RELEASE_SIGNING_KEY: ${{ secrets.RELEASE_SIGNING_KEY }}
+        run: |
+          go build -o relctl ./cmd/relctl
+          mkdir -p keys
+          if [ -n "$RELEASE_SIGNING_KEY" ]; then
+            printf '%s\n' "$RELEASE_SIGNING_KEY" > keys/release.key
+            openssl pkey -in keys/release.key -pubout -out keys/release.pub
+            ./relctl trust --pub keys/release.pub --dir keys/trusted
+          else
+            echo "::notice::no RELEASE_SIGNING_KEY secret; signing with a throwaway key"
+            ./relctl keygen --out keys/release --trust keys/trusted
+          fi
+      - name: create, sign and verify the manifest
+        run: |
+          export SOURCE_DATE_EPOCH=$(git log -1 --format=%ct)
+          version="0.0.$(git rev-list --count HEAD)"
+          ./relctl manifest create --spec releases/spec.json --version "$version" --service-version 1.1.0 \
+            --arch amd64 --images out/amd64/images --migrations migrations --commit "$GITHUB_SHA" --out bundle
+          ./relctl manifest sign --bundle bundle --key keys/release.key
+          ./relctl manifest verify --bundle bundle --trust keys/trusted
+          # Independent check with openssl, as the preflight does.
+          keyid=$(jq -r .key_id bundle/release.json.sig)
+          jq -r .signature bundle/release.json.sig | base64 -d > sig.bin
+          openssl pkeyutl -verify -pubin -inkey "keys/trusted/$keyid.pem" -rawin -in bundle/release.json -sigfile sig.bin
+      - name: manifest checksums match every runner's build
+        run: |
+          ref=sums/sums-ubuntu-24.04/SHA256SUMS
+          jq -r '.services[] | "\(.binary_sha256) \(.name)-\(.version) \(.digest | ltrimstr("sha256:")) \(.name):\(.version)"' bundle/release.json |
+          while read -r bin binname digest image; do
+            grep -q "^$bin  linux-amd64/bin/$binname\$" "$ref" || { echo "::error::$binname checksum not in builds"; exit 1; }
+            grep -q "^$digest  linux-amd64/image:$image\$" "$ref" || { echo "::error::$image digest not in builds"; exit 1; }
+            echo "ok $image $digest"
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-bundle
+          path: |
+            bundle/
+            keys/trusted/
+
+  # The whole system on a Linux runner: 3-node Nomad cluster, preflight
+  # fault suite, and (on demand) the recovery scenarios.
+  integration:
+    needs: test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    env:
+      ARCH: amd64
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: cluster up
+        run: make up ARCH=amd64
+      - name: deploy baseline releases
+        run: |
+          make release VERSION=1.0.0 SVC_VERSION=1.0.0 TARGET=3 ARCH=amd64 && make deploy VERSION=1.0.0
+          make release VERSION=1.1.0 SVC_VERSION=1.1.0 TARGET=4 ARCH=amd64 && make deploy VERSION=1.1.0
+      - name: preflight fault suite
+        run: make faults
+      - name: recovery scenarios
+        if: github.event_name == 'workflow_dispatch' && inputs.recovery
+        run: make recovery ARCH=amd64
+      - name: cluster logs
+        if: failure()
+        run: |
+          docker compose -f deploy/compose.yaml logs --tail 200 nomad-server node1 node2 node3
+          docker exec relorch-ops relctl history || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: results
+          path: results/

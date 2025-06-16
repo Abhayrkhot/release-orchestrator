@@ -1,0 +1,89 @@
+{
+  "mode": "unhealthy",
+  "runs": [
+    {
+      "run": 1,
+      "status": "rolled_back",
+      "reason": "allocation 94ac6f15 on node2 marked unhealthy: Alloc Unhealthy: Task not running for min_healthy_time of 3s by healthy_deadline of 20s",
+      "rollback_seconds": 6.136543794,
+      "recovery_seconds": 27.066750819
+    },
+    {
+      "run": 2,
+      "status": "rolled_back",
+      "reason": "allocation b321c2fc on node2 marked unhealthy: Alloc Unhealthy: Task not running for min_healthy_time of 3s by healthy_deadline of 20s",
+      "rollback_seconds": 5.669966567,
+      "recovery_seconds": 26.632331055999998
+    },
+    {
+      "run": 3,
+      "status": "rolled_back",
+      "reason": "allocation 58a19882 on node2 marked unhealthy: Alloc Unhealthy: Task not running for min_healthy_time of 3s by healthy_deadline of 20s",
+      "rollback_seconds": 5.082421567,
+      "recovery_seconds": 25.914139826
+    },
+    {
+      "run": 4,
+      "status": "rolled_back",
+      "reason": "allocation b28f4b64 on node2 marked unhealthy: Alloc Unhealthy: Task not running for min_healthy_time of 3s by healthy_deadline of 20s",
+      "rollback_seconds": 5.147038812,
+      "recovery_seconds": 26.052683092
+    },
+    {
+      "run": 5,
+      "status": "rolled_back",
+      "reason": "allocation 9c35e426 on node2 marked unhealthy: Alloc Unhealthy: Task not running for min_healthy_time of 3s by healthy_deadline of 20s",
+      "rollback_seconds": 5.085096077,
+      "recovery_seconds": 25.991143421
+    },
+    {
+      "run": 6,
+      "status": "rolled_back",
+      "reason": "allocation fb774c99 on node2 marked unhealthy: Alloc Unhealthy: Task not running for min_healthy_time of 3s by healthy_deadline of 20s",
+      "rollback_seconds": 5.206644071,
+      "recovery_seconds": 26.188720418
+    },
+    {
+      "run": 7,
+      "status": "rolled_back",
+      "reason": "allocation b43341aa on node2 marked unhealthy: Alloc Unhealthy: Task not running for min_healthy_time of 3s by healthy_deadline of 20s",
+      "rollback_seconds": 5.654979999,
+      "recovery_seconds": 26.672077912
+    },
+    {
+      "run": 8,
+      "status": "rolled_back",
+      "reason": "allocation 22854ed3 on node2 marked unhealthy: Alloc Unhealthy: Task not running for min_healthy_time of 3s by healthy_deadline of 20s",
+      "rollback_seconds": 5.657178493,
+      "recovery_seconds": 26.652330173
+    },
+    {
+      "run": 9,
+      "status": "rolled_back",
+      "reason": "allocation 522d7d0b on node2 marked unhealthy: Alloc Unhealthy: Task not running for min_healthy_time of 3s by healthy_deadline of 20s",
+      "rollback_seconds": 6.212312405,
+      "recovery_seconds": 27.250462181
+    },
+    {
+      "run": 10,
+      "status": "rolled_back",
+      "reason": "allocation 1fd6341d on node2 marked unhealthy: Alloc Unhealthy: Task not running for min_healthy_time of 3s by healthy_deadline of 20s",
+      "rollback_seconds": 5.161331583,
+      "recovery_seconds": 26.63263357
+    }
+  ],
+  "rollback_seconds": {
+    "n": 10,
+    "min": 5.1,
+    "p50": 5.7,
+    "p95": 6.2,
+    "max": 6.2
+  },
+  "recovery_seconds": {
+    "n": 10,
+    "min": 25.9,
+    "p50": 26.6,
+    "p95": 27.3,
+    "max": 27.3
+  }
+}

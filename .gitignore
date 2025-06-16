@@ -1,0 +1,12 @@
+/dist/
+/keys/
+/releases/out/
+/test/faults/work/
+/test/integration/work/
+*.test
+.DS_Store
+# Raw run logs carry machine paths; the JSON results and the recovery test
+# log are kept.
+/results/*.log
+/results/*.jsonl
+!/results/recovery.log

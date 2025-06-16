@@ -1,0 +1,775 @@
+=== RUN   TestR01CrashOnStart
+    scenarios_test.go:23: === R01 New catalog-api version crashes on start
+    scenarios_test.go:25: deploy bad: exit 4
+        PF08  PASS  MySQL reachable                    MySQL 8.4.13 at mysql:3306
+        PF09  PASS  Migration user privileges          relctl has ALL PRIVILEGES on app
+        PF10  PASS  No dirty migration                 no dirty migrations
+        PF11  PASS  Applied migrations match release   4 applied migrations match
+        PF12  PASS  Schema not ahead of release        schema 4 -> 4
+        PF13  PASS  No out-of-band schema change       schema matches snapshot 629fe2cd5777 (v4)
+        PF14  PASS  Rollback stays possible            running release 1.1.7 accepts schema 4
+        PF15  PASS  Services accept target schema      every service accepts schema 4
+        PF16  PASS  No long transactions or table locks no transaction older than 10s, no table locks
+        PF17  PASS  Running release healthy            9 allocations of 1.1.7 passing checks
+        PF18  PASS  Service secrets present            db_dsn present for 3 services
+        PF19  PASS  No interrupted release             no release in progress
+        PF20  PASS  Release is newer than running      1.1.7 -> 1.1.8
+        03:20:57.085  start                     release 1.1.8 (previous 1.1.7), signed by fcfc0b2f0789e16a
+        03:20:57.119  migrated                  schema 4 -> 4
+        03:20:57.139  rollout    catalog-api    v1.1.0 3dcdad015df1 x3
+        03:20:58.730  failed     catalog-api    task catalog-api on node3 restarted: Terminated: Exit Code: 3, Exit Message: "Docker container exited with non-zero exit code: 3" (after 1.565s)
+        03:20:58.748  rollback   catalog-api    to v1.1.0 (release 1.1.7)
+        03:21:04.454  restored   catalog-api    v1.1.0 healthy in 5.706s
+        03:21:04.458  restored                  previous release 1.1.7 healthy 5.7s after failure was detected
+        03:21:04.469  rolled_back                task catalog-api on node3 restarted: Terminated: Exit Code: 3, Exit Message: "Docker container exited with non-zero exit code: 3"
+        
+        deploy 1.1.8: ROLLED_BACK (task catalog-api on node3 restarted: Terminated: Exit Code: 3, Exit Message: "Docker container exited with non-zero exit code: 3")
+        rollback: previous release healthy 5.7s after failure detected (7.3s after the bad rollout began)
+        relctl: release 1.1.8 rolled back: task catalog-api on node3 restarted: Terminated: Exit Code: 3, Exit Message: "Docker container exited with non-zero exit code: 3"
+    harness_test.go:173: failure: task catalog-api on node3 restarted: Terminated: Exit Code: 3, Exit Message: "Docker container exited with non-zero exit code: 3"
+    harness_test.go:173: rollback 5.7s after detection, 7.3s after the bad rollout began
+--- PASS: TestR01CrashOnStart (9.24s)
+=== RUN   TestR02FailsHealthChecks
+    scenarios_test.go:30: === R02 New version runs but never passes its health check
+    scenarios_test.go:32: deploy bad: exit 4
+        PF08  PASS  MySQL reachable                    MySQL 8.4.13 at mysql:3306
+        PF09  PASS  Migration user privileges          relctl has ALL PRIVILEGES on app
+        PF10  PASS  No dirty migration                 no dirty migrations
+        PF11  PASS  Applied migrations match release   4 applied migrations match
+        PF12  PASS  Schema not ahead of release        schema 4 -> 4
+        PF13  PASS  No out-of-band schema change       schema matches snapshot 629fe2cd5777 (v4)
+        PF14  PASS  Rollback stays possible            running release 1.1.7 accepts schema 4
+        PF15  PASS  Services accept target schema      every service accepts schema 4
+        PF16  PASS  No long transactions or table locks no transaction older than 10s, no table locks
+        PF17  PASS  Running release healthy            9 allocations of 1.1.7 passing checks
+        PF18  PASS  Service secrets present            db_dsn present for 3 services
+        PF19  PASS  No interrupted release             no release in progress
+        PF20  PASS  Release is newer than running      1.1.7 -> 1.1.8
+        03:21:06.519  start                     release 1.1.8 (previous 1.1.7), signed by fcfc0b2f0789e16a
+        03:21:06.548  migrated                  schema 4 -> 4
+        03:21:06.567  rollout    catalog-api    v1.1.0 3dcdad015df1 x3
+        03:21:27.804  failed     catalog-api    allocation ba4826ae on node3 marked unhealthy: Alloc Unhealthy: Task not running for min_healthy_time of 3s by healthy_deadline of 20s (after 21.224s)
+        03:21:27.807  rollback   catalog-api    to v1.1.0 (release 1.1.7)
+        03:21:34.033  restored   catalog-api    v1.1.0 healthy in 6.226s
+        03:21:34.035  restored                  previous release 1.1.7 healthy 6.2s after failure was detected
+        03:21:34.039  rolled_back                allocation ba4826ae on node3 marked unhealthy: Alloc Unhealthy: Task not running for min_healthy_time of 3s by healthy_deadline of 20s
+        
+        deploy 1.1.8: ROLLED_BACK (allocation ba4826ae on node3 marked unhealthy: Alloc Unhealthy: Task not running for min_healthy_time of 3s by healthy_deadline of 20s)
+        rollback: previous release healthy 6.2s after failure detected (27.5s after the bad rollout began)
+        relctl: release 1.1.8 rolled back: allocation ba4826ae on node3 marked unhealthy: Alloc Unhealthy: Task not running for min_healthy_time of 3s by healthy_deadline of 20s
+    harness_test.go:173: failure: allocation ba4826ae on node3 marked unhealthy: Alloc Unhealthy: Task not running for min_healthy_time of 3s by healthy_deadline of 20s
+    harness_test.go:173: rollback 6.2s after detection, 27.5s after the bad rollout began
+--- PASS: TestR02FailsHealthChecks (29.51s)
+=== RUN   TestR03SlowStart
+    scenarios_test.go:37: === R03 New version starts slower than the health deadline
+    scenarios_test.go:39: deploy bad: exit 4
+        PF08  PASS  MySQL reachable                    MySQL 8.4.13 at mysql:3306
+        PF09  PASS  Migration user privileges          relctl has ALL PRIVILEGES on app
+        PF10  PASS  No dirty migration                 no dirty migrations
+        PF11  PASS  Applied migrations match release   4 applied migrations match
+        PF12  PASS  Schema not ahead of release        schema 4 -> 4
+        PF13  PASS  No out-of-band schema change       schema matches snapshot 629fe2cd5777 (v4)
+        PF14  PASS  Rollback stays possible            running release 1.1.7 accepts schema 4
+        PF15  PASS  Services accept target schema      every service accepts schema 4
+        PF16  PASS  No long transactions or table locks no transaction older than 10s, no table locks
+        PF17  PASS  Running release healthy            9 allocations of 1.1.7 passing checks
+        PF18  PASS  Service secrets present            db_dsn present for 3 services
+        PF19  PASS  No interrupted release             no release in progress
+        PF20  PASS  Release is newer than running      1.1.7 -> 1.1.8
+        03:21:35.937  start                     release 1.1.8 (previous 1.1.7), signed by fcfc0b2f0789e16a
+        03:21:35.948  migrated                  schema 4 -> 4
+        03:21:35.960  rollout    catalog-api    v1.1.0 3dcdad015df1 x3
+        03:21:56.604  failed     catalog-api    allocation 885889af on node3 marked unhealthy: Alloc Unhealthy: Task not running for min_healthy_time of 3s by healthy_deadline of 20s (after 20.635s)
+        03:21:56.606  rollback   catalog-api    to v1.1.0 (release 1.1.7)
+        03:22:01.785  restored   catalog-api    v1.1.0 healthy in 5.178s
+        03:22:01.786  restored                  previous release 1.1.7 healthy 5.2s after failure was detected
+        03:22:01.789  rolled_back                allocation 885889af on node3 marked unhealthy: Alloc Unhealthy: Task not running for min_healthy_time of 3s by healthy_deadline of 20s
+        
+        deploy 1.1.8: ROLLED_BACK (allocation 885889af on node3 marked unhealthy: Alloc Unhealthy: Task not running for min_healthy_time of 3s by healthy_deadline of 20s)
+        rollback: previous release healthy 5.2s after failure detected (25.8s after the bad rollout began)
+        relctl: release 1.1.8 rolled back: allocation 885889af on node3 marked unhealthy: Alloc Unhealthy: Task not running for min_healthy_time of 3s by healthy_deadline of 20s
+    harness_test.go:173: failure: allocation 885889af on node3 marked unhealthy: Alloc Unhealthy: Task not running for min_healthy_time of 3s by healthy_deadline of 20s
+    harness_test.go:173: rollback 5.2s after detection, 25.8s after the bad rollout began
+--- PASS: TestR03SlowStart (27.71s)
+=== RUN   TestR04CrashAfterHealthy
+    scenarios_test.go:44: === R04 New version passes checks, then crashes mid-rollout
+    scenarios_test.go:46: deploy bad: exit 4
+        PF08  PASS  MySQL reachable                    MySQL 8.4.13 at mysql:3306
+        PF09  PASS  Migration user privileges          relctl has ALL PRIVILEGES on app
+        PF10  PASS  No dirty migration                 no dirty migrations
+        PF11  PASS  Applied migrations match release   4 applied migrations match
+        PF12  PASS  Schema not ahead of release        schema 4 -> 4
+        PF13  PASS  No out-of-band schema change       schema matches snapshot 629fe2cd5777 (v4)
+        PF14  PASS  Rollback stays possible            running release 1.1.7 accepts schema 4
+        PF15  PASS  Services accept target schema      every service accepts schema 4
+        PF16  PASS  No long transactions or table locks no transaction older than 10s, no table locks
+        PF17  PASS  Running release healthy            9 allocations of 1.1.7 passing checks
+        PF18  PASS  Service secrets present            db_dsn present for 3 services
+        PF19  PASS  No interrupted release             no release in progress
+        PF20  PASS  Release is newer than running      1.1.7 -> 1.1.8
+        03:22:03.582  start                     release 1.1.8 (previous 1.1.7), signed by fcfc0b2f0789e16a
+        03:22:03.593  migrated                  schema 4 -> 4
+        03:22:03.603  rollout    catalog-api    v1.1.0 3dcdad015df1 x3
+        03:22:12.478  failed     catalog-api    task catalog-api on node3 restarted: Terminated: Exit Code: 5, Exit Message: "Docker container exited with non-zero exit code: 5" (after 8.861s)
+        03:22:12.481  rollback   catalog-api    to v1.1.0 (release 1.1.7)
+        03:22:18.244  restored   catalog-api    v1.1.0 healthy in 5.762s
+        03:22:18.245  restored                  previous release 1.1.7 healthy 5.8s after failure was detected
+        03:22:18.249  rolled_back                task catalog-api on node3 restarted: Terminated: Exit Code: 5, Exit Message: "Docker container exited with non-zero exit code: 5"
+        
+        deploy 1.1.8: ROLLED_BACK (task catalog-api on node3 restarted: Terminated: Exit Code: 5, Exit Message: "Docker container exited with non-zero exit code: 5")
+        rollback: previous release healthy 5.8s after failure detected (14.6s after the bad rollout began)
+        relctl: release 1.1.8 rolled back: task catalog-api on node3 restarted: Terminated: Exit Code: 5, Exit Message: "Docker container exited with non-zero exit code: 5"
+    harness_test.go:173: failure: task catalog-api on node3 restarted: Terminated: Exit Code: 5, Exit Message: "Docker container exited with non-zero exit code: 5"
+    harness_test.go:173: rollback 5.8s after detection, 14.6s after the bad rollout began
+--- PASS: TestR04CrashAfterHealthy (16.44s)
+=== RUN   TestR05OutOfMemory
+    scenarios_test.go:51: === R05 New version exceeds its memory limit and is OOM-killed
+    scenarios_test.go:53: deploy bad: exit 4
+        PF08  PASS  MySQL reachable                    MySQL 8.4.13 at mysql:3306
+        PF09  PASS  Migration user privileges          relctl has ALL PRIVILEGES on app
+        PF10  PASS  No dirty migration                 no dirty migrations
+        PF11  PASS  Applied migrations match release   4 applied migrations match
+        PF12  PASS  Schema not ahead of release        schema 4 -> 4
+        PF13  PASS  No out-of-band schema change       schema matches snapshot 629fe2cd5777 (v4)
+        PF14  PASS  Rollback stays possible            running release 1.1.7 accepts schema 4
+        PF15  PASS  Services accept target schema      every service accepts schema 4
+        PF16  PASS  No long transactions or table locks no transaction older than 10s, no table locks
+        PF17  PASS  Running release healthy            9 allocations of 1.1.7 passing checks
+        PF18  PASS  Service secrets present            db_dsn present for 3 services
+        PF19  PASS  No interrupted release             no release in progress
+        PF20  PASS  Release is newer than running      1.1.7 -> 1.1.8
+        03:22:20.075  start                     release 1.1.8 (previous 1.1.7), signed by fcfc0b2f0789e16a
+        03:22:20.087  migrated                  schema 4 -> 4
+        03:22:20.096  rollout    catalog-api    v1.1.0 3dcdad015df1 x3
+        03:22:21.686  failed     catalog-api    task catalog-api on node3 restarted: Terminated: Exit Code: 137, Exit Message: "OOM Killed" (after 1.579s)
+        03:22:21.690  rollback   catalog-api    to v1.1.0 (release 1.1.7)
+        03:22:26.899  restored   catalog-api    v1.1.0 healthy in 5.209s
+        03:22:26.900  restored                  previous release 1.1.7 healthy 5.2s after failure was detected
+        03:22:26.902  rolled_back                task catalog-api on node3 restarted: Terminated: Exit Code: 137, Exit Message: "OOM Killed"
+        
+        deploy 1.1.8: ROLLED_BACK (task catalog-api on node3 restarted: Terminated: Exit Code: 137, Exit Message: "OOM Killed")
+        rollback: previous release healthy 5.2s after failure detected (6.8s after the bad rollout began)
+        relctl: release 1.1.8 rolled back: task catalog-api on node3 restarted: Terminated: Exit Code: 137, Exit Message: "OOM Killed"
+    harness_test.go:173: failure: task catalog-api on node3 restarted: Terminated: Exit Code: 137, Exit Message: "OOM Killed"
+    harness_test.go:173: rollback 5.2s after detection, 6.8s after the bad rollout began
+--- PASS: TestR05OutOfMemory (8.69s)
+=== RUN   TestR06BinaryRejectsSchema
+    scenarios_test.go:58: === R06 Binary refuses the live schema although its manifest accepts it
+    scenarios_test.go:60: deploy bad: exit 4
+        PF12  PASS  Schema not ahead of release        schema 4 -> 4
+        PF13  PASS  No out-of-band schema change       schema matches snapshot 629fe2cd5777 (v4)
+        PF14  PASS  Rollback stays possible            running release 1.1.7 accepts schema 4
+        PF15  PASS  Services accept target schema      every service accepts schema 4
+        PF16  PASS  No long transactions or table locks no transaction older than 10s, no table locks
+        PF17  PASS  Running release healthy            9 allocations of 1.1.7 passing checks
+        PF18  PASS  Service secrets present            db_dsn present for 3 services
+        PF19  PASS  No interrupted release             no release in progress
+        PF20  PASS  Release is newer than running      1.1.7 -> 1.1.8
+        03:22:28.750  start                     release 1.1.8 (previous 1.1.7), signed by fcfc0b2f0789e16a
+        03:22:28.758  migrated                  schema 4 -> 4
+        03:22:28.771  rollout    catalog-api    v1.1.0 3dcdad015df1 x3
+        03:22:46.445  healthy    catalog-api    job version 48 in 17.666s
+        03:22:46.447  rollout    edge-gateway   v1.1.0 9138e1f03abc x3
+        03:22:48.006  failed     edge-gateway   task edge-gateway on node3 restarted: Terminated: Exit Code: 1, Exit Message: "Docker container exited with non-zero exit code: 1" (after 1.549s)
+        03:22:48.011  rollback   edge-gateway   to v1.1.0 (release 1.1.7)
+        03:22:53.694  restored   edge-gateway   v1.1.0 healthy in 5.683s
+        03:22:53.704  rollback   catalog-api    to v1.1.0 (release 1.1.7)
+        03:23:01.562  restored   catalog-api    v1.1.0 healthy in 7.858s
+        03:23:01.569  restored                  previous release 1.1.7 healthy 13.6s after failure was detected
+        03:23:01.586  rolled_back                task edge-gateway on node3 restarted: Terminated: Exit Code: 1, Exit Message: "Docker container exited with non-zero exit code: 1"
+        
+        deploy 1.1.8: ROLLED_BACK (task edge-gateway on node3 restarted: Terminated: Exit Code: 1, Exit Message: "Docker container exited with non-zero exit code: 1")
+        rollback: previous release healthy 13.6s after failure detected (15.1s after the bad rollout began)
+        relctl: release 1.1.8 rolled back: task edge-gateway on node3 restarted: Terminated: Exit Code: 1, Exit Message: "Docker container exited with non-zero exit code: 1"
+    harness_test.go:173: failure: task edge-gateway on node3 restarted: Terminated: Exit Code: 1, Exit Message: "Docker container exited with non-zero exit code: 1"
+    harness_test.go:173: rollback 13.6s after detection, 15.1s after the bad rollout began
+--- PASS: TestR06BinaryRejectsSchema (34.79s)
+=== RUN   TestR07FailsOnOneNode
+    scenarios_test.go:65: === R07 New version fails on one node only (partial failure)
+    scenarios_test.go:67: deploy bad: exit 4
+        PF08  PASS  MySQL reachable                    MySQL 8.4.13 at mysql:3306
+        PF09  PASS  Migration user privileges          relctl has ALL PRIVILEGES on app
+        PF10  PASS  No dirty migration                 no dirty migrations
+        PF11  PASS  Applied migrations match release   4 applied migrations match
+        PF12  PASS  Schema not ahead of release        schema 4 -> 4
+        PF13  PASS  No out-of-band schema change       schema matches snapshot 629fe2cd5777 (v4)
+        PF14  PASS  Rollback stays possible            running release 1.1.7 accepts schema 4
+        PF15  PASS  Services accept target schema      every service accepts schema 4
+        PF16  PASS  No long transactions or table locks no transaction older than 10s, no table locks
+        PF17  PASS  Running release healthy            9 allocations of 1.1.7 passing checks
+        PF18  PASS  Service secrets present            db_dsn present for 3 services
+        PF19  PASS  No interrupted release             no release in progress
+        PF20  PASS  Release is newer than running      1.1.7 -> 1.1.8
+        03:23:03.917  start                     release 1.1.8 (previous 1.1.7), signed by fcfc0b2f0789e16a
+        03:23:03.965  migrated                  schema 4 -> 4
+        03:23:03.994  rollout    catalog-api    v1.1.0 3dcdad015df1 x3
+        03:23:11.855  failed     catalog-api    task catalog-api on node2 restarted: Terminated: Exit Code: 3, Exit Message: "Docker container exited with non-zero exit code: 3" (after 7.827s)
+        03:23:11.881  rollback   catalog-api    to v1.1.0 (release 1.1.7)
+        03:23:17.605  restored   catalog-api    v1.1.0 healthy in 5.724s
+        03:23:17.617  restored                  previous release 1.1.7 healthy 5.8s after failure was detected
+        03:23:17.633  rolled_back                task catalog-api on node2 restarted: Terminated: Exit Code: 3, Exit Message: "Docker container exited with non-zero exit code: 3"
+        
+        deploy 1.1.8: ROLLED_BACK (task catalog-api on node2 restarted: Terminated: Exit Code: 3, Exit Message: "Docker container exited with non-zero exit code: 3")
+        rollback: previous release healthy 5.8s after failure detected (13.6s after the bad rollout began)
+        relctl: release 1.1.8 rolled back: task catalog-api on node2 restarted: Terminated: Exit Code: 3, Exit Message: "Docker container exited with non-zero exit code: 3"
+    harness_test.go:173: failure: task catalog-api on node2 restarted: Terminated: Exit Code: 3, Exit Message: "Docker container exited with non-zero exit code: 3"
+    harness_test.go:173: rollback 5.8s after detection, 13.6s after the bad rollout began
+    harness_test.go:173: allocations already upgraded on other nodes were reverted too
+--- PASS: TestR07FailsOnOneNode (16.14s)
+=== RUN   TestR08LastServiceFails
+    scenarios_test.go:75: === R08 Last service in dependency order fails; all three roll back in reverse
+    scenarios_test.go:77: deploy bad: exit 4
+        PF16  PASS  No long transactions or table locks no transaction older than 10s, no table locks
+        PF17  PASS  Running release healthy            9 allocations of 1.1.7 passing checks
+        PF18  PASS  Service secrets present            db_dsn present for 3 services
+        PF19  PASS  No interrupted release             no release in progress
+        PF20  PASS  Release is newer than running      1.1.7 -> 1.1.8
+        03:23:20.096  start                     release 1.1.8 (previous 1.1.7), signed by fcfc0b2f0789e16a
+        03:23:20.143  migrated                  schema 4 -> 4
+        03:23:20.184  rollout    catalog-api    v1.1.0 3dcdad015df1 x3
+        03:23:38.909  healthy    catalog-api    job version 52 in 18.701s
+        03:23:38.937  rollout    edge-gateway   v1.1.0 9138e1f03abc x3
+        03:23:58.547  healthy    edge-gateway   job version 27 in 19.589s
+        03:23:58.565  rollout    order-worker   v1.1.0 eb48c2bef299 x3
+        03:24:00.147  failed     order-worker   task order-worker on node3 restarted: Terminated: Exit Code: 3, Exit Message: "Docker container exited with non-zero exit code: 3" (after 1.544s)
+        03:24:00.174  rollback   order-worker   to v1.1.0 (release 1.1.7)
+        03:24:05.835  restored   order-worker   v1.1.0 healthy in 5.661s
+        03:24:05.843  rollback   edge-gateway   to v1.1.0 (release 1.1.7)
+        03:24:13.608  restored   edge-gateway   v1.1.0 healthy in 7.766s
+        03:24:13.616  rollback   catalog-api    to v1.1.0 (release 1.1.7)
+        03:24:21.453  restored   catalog-api    v1.1.0 healthy in 7.837s
+        03:24:21.465  restored                  previous release 1.1.7 healthy 21.3s after failure was detected
+        03:24:21.486  rolled_back                task order-worker on node3 restarted: Terminated: Exit Code: 3, Exit Message: "Docker container exited with non-zero exit code: 3"
+        
+        deploy 1.1.8: ROLLED_BACK (task order-worker on node3 restarted: Terminated: Exit Code: 3, Exit Message: "Docker container exited with non-zero exit code: 3")
+        rollback: previous release healthy 21.3s after failure detected (22.9s after the bad rollout began)
+        relctl: release 1.1.8 rolled back: task order-worker on node3 restarted: Terminated: Exit Code: 3, Exit Message: "Docker container exited with non-zero exit code: 3"
+    harness_test.go:173: failure: task order-worker on node3 restarted: Terminated: Exit Code: 3, Exit Message: "Docker container exited with non-zero exit code: 3"
+    harness_test.go:173: rollback 21.3s after detection, 22.9s after the bad rollout began
+    harness_test.go:173: rollback order [order-worker edge-gateway catalog-api]
+--- PASS: TestR08LastServiceFails (63.81s)
+=== RUN   TestR09MiddleServiceFails
+    scenarios_test.go:88: === R09 Middle service fails; services after it are never touched
+    scenarios_test.go:91: deploy bad: exit 4
+        PF12  PASS  Schema not ahead of release        schema 4 -> 4
+        PF13  PASS  No out-of-band schema change       schema matches snapshot 629fe2cd5777 (v4)
+        PF14  PASS  Rollback stays possible            running release 1.1.7 accepts schema 4
+        PF15  PASS  Services accept target schema      every service accepts schema 4
+        PF16  PASS  No long transactions or table locks no transaction older than 10s, no table locks
+        PF17  PASS  Running release healthy            9 allocations of 1.1.7 passing checks
+        PF18  PASS  Service secrets present            db_dsn present for 3 services
+        PF19  PASS  No interrupted release             no release in progress
+        PF20  PASS  Release is newer than running      1.1.7 -> 1.1.8
+        03:24:23.890  start                     release 1.1.8 (previous 1.1.7), signed by fcfc0b2f0789e16a
+        03:24:23.954  migrated                  schema 4 -> 4
+        03:24:23.981  rollout    catalog-api    v1.1.0 3dcdad015df1 x3
+        03:24:42.724  healthy    catalog-api    job version 54 in 18.72s
+        03:24:42.742  rollout    edge-gateway   v1.1.0 9138e1f03abc x3
+        03:25:03.899  failed     edge-gateway   allocation 3945854b on node3 marked unhealthy: Alloc Unhealthy: Task not running for min_healthy_time of 3s by healthy_deadline of 20s (after 21.127s)
+        03:25:03.923  rollback   edge-gateway   to v1.1.0 (release 1.1.7)
+        03:25:09.607  restored   edge-gateway   v1.1.0 healthy in 5.684s
+        03:25:09.618  rollback   catalog-api    to v1.1.0 (release 1.1.7)
+        03:25:17.472  restored   catalog-api    v1.1.0 healthy in 7.854s
+        03:25:17.474  restored                  previous release 1.1.7 healthy 13.6s after failure was detected
+        03:25:17.490  rolled_back                allocation 3945854b on node3 marked unhealthy: Alloc Unhealthy: Task not running for min_healthy_time of 3s by healthy_deadline of 20s
+        
+        deploy 1.1.8: ROLLED_BACK (allocation 3945854b on node3 marked unhealthy: Alloc Unhealthy: Task not running for min_healthy_time of 3s by healthy_deadline of 20s)
+        rollback: previous release healthy 13.6s after failure detected (34.7s after the bad rollout began)
+        relctl: release 1.1.8 rolled back: allocation 3945854b on node3 marked unhealthy: Alloc Unhealthy: Task not running for min_healthy_time of 3s by healthy_deadline of 20s
+    harness_test.go:173: failure: allocation 3945854b on node3 marked unhealthy: Alloc Unhealthy: Task not running for min_healthy_time of 3s by healthy_deadline of 20s
+    harness_test.go:173: rollback 13.6s after detection, 34.7s after the bad rollout began
+    harness_test.go:173: order-worker job version unchanged at 16
+--- PASS: TestR09MiddleServiceFails (55.96s)
+=== RUN   TestR25DependentsWaitForUpstream
+    scenarios_test.go:103: === R25 Dependents roll out only after catalog-api is healthy
+    scenarios_test.go:104: deploy good: exit 0
+        PF08  PASS  MySQL reachable                    MySQL 8.4.13 at mysql:3306
+        PF09  PASS  Migration user privileges          relctl has ALL PRIVILEGES on app
+        PF10  PASS  No dirty migration                 no dirty migrations
+        PF11  PASS  Applied migrations match release   4 applied migrations match
+        PF12  PASS  Schema not ahead of release        schema 4 -> 4
+        PF13  PASS  No out-of-band schema change       schema matches snapshot 629fe2cd5777 (v4)
+        PF14  PASS  Rollback stays possible            running release 1.1.7 accepts schema 4
+        PF15  PASS  Services accept target schema      every service accepts schema 4
+        PF16  PASS  No long transactions or table locks no transaction older than 10s, no table locks
+        PF17  PASS  Running release healthy            9 allocations of 1.1.7 passing checks
+        PF18  PASS  Service secrets present            db_dsn present for 3 services
+        PF19  PASS  No interrupted release             no release in progress
+        PF20  PASS  Release is newer than running      1.1.7 -> 1.1.8
+        03:25:19.443  start                     release 1.1.8 (previous 1.1.7), signed by fcfc0b2f0789e16a
+        03:25:19.485  migrated                  schema 4 -> 4
+        03:25:19.502  rollout    catalog-api    v1.1.0 3dcdad015df1 x3
+        03:25:38.281  healthy    catalog-api    job version 56 in 18.767s
+        03:25:38.293  rollout    edge-gateway   v1.1.0 9138e1f03abc x3
+        03:25:56.909  healthy    edge-gateway   job version 31 in 18.594s
+        03:25:56.926  rollout    order-worker   v1.1.0 eb48c2bef299 x3
+        03:26:17.423  healthy    order-worker   job version 17 in 20.481s
+        03:26:17.479  verified                  9 allocations run the signed binaries
+        03:26:17.494  succeeded                 
+        
+        deploy 1.1.8: SUCCEEDED
+    harness_test.go:173: all 6 dependent instances started after catalog-api was healthy at 03:25:38.281
+--- PASS: TestR25DependentsWaitForUpstream (60.16s)
+=== RUN   TestR23ColdRestartOrdering
+    scenarios_test.go:144: === R23 All three nodes restart at once; dependents become ready only after catalog-api
+    harness_test.go:173: all services healthy and verified 16s after the restart, without operator action
+    harness_test.go:173: first catalog-api ready 03:26:31.024; first of 6 dependents ready 03:26:32.639
+--- PASS: TestR23ColdRestartOrdering (18.75s)
+=== RUN   TestR24TransientUpstreamOutage
+    scenarios_test.go:181: === R24 catalog-api briefly unavailable during an order-worker rollout; no false rollback
+    harness_test.go:173: all 3 catalog-api instances failing health checks for 6s
+    scenarios_test.go:192: background deploy:
+        PF06  PASS  Enough ready Docker nodes          3 nodes ready [node1,node2,node3]
+        PF07  PASS  Nomad can place every service      all 3 jobs placeable
+        PF08  PASS  MySQL reachable                    MySQL 8.4.13 at mysql:3306
+        PF09  PASS  Migration user privileges          relctl has ALL PRIVILEGES on app
+        PF10  PASS  No dirty migration                 no dirty migrations
+        PF11  PASS  Applied migrations match release   4 applied migrations match
+        PF12  PASS  Schema not ahead of release        schema 4 -> 4
+        PF13  PASS  No out-of-band schema change       schema matches snapshot 629fe2cd5777 (v4)
+        PF14  PASS  Rollback stays possible            running release 1.1.8 accepts schema 4
+        PF15  PASS  Services accept target schema      every service accepts schema 4
+        PF16  PASS  No long transactions or table locks no transaction older than 10s, no table locks
+        PF17  PASS  Running release healthy            9 allocations of 1.1.8 passing checks
+        PF18  PASS  Service secrets present            db_dsn present for 3 services
+        PF19  PASS  No interrupted release             no release in progress
+        PF20  PASS  Release is newer than running      1.1.8 -> 1.1.9
+        03:26:38.591  start                     release 1.1.9 (previous 1.1.8), signed by fcfc0b2f0789e16a
+        03:26:38.641  migrated                  schema 4 -> 4
+        03:26:38.653  unchanged  catalog-api    v1.1.0 already running
+        03:26:38.664  unchanged  edge-gateway   v1.1.0 already running
+        03:26:38.689  rollout    order-worker   v1.1.0 eb48c2bef299 x3
+        03:27:04.391  healthy    order-worker   job version 18 in 25.684s
+        03:27:04.434  verified                  3 allocations run the signed binaries
+        03:27:04.458  succeeded                 
+        
+        deploy 1.1.9: SUCCEEDED
+--- PASS: TestR24TransientUpstreamOutage (28.13s)
+=== RUN   TestR10ImageVanishesMidRollout
+    scenarios_test.go:234: === R10 Image deleted from the registry after preflight, before its service rolls out
+    harness_test.go:173: deleted edge-gateway@ae75fe7e4c30 while catalog-api was rolling out
+    scenarios_test.go:244: background deploy:
+        PF12  PASS  Schema not ahead of release        schema 4 -> 4
+        PF13  PASS  No out-of-band schema change       schema matches snapshot 629fe2cd5777 (v4)
+        PF14  PASS  Rollback stays possible            running release 1.1.9 accepts schema 4
+        PF15  PASS  Services accept target schema      every service accepts schema 4
+        PF16  PASS  No long transactions or table locks no transaction older than 10s, no table locks
+        PF17  PASS  Running release healthy            9 allocations of 1.1.9 passing checks
+        PF18  PASS  Service secrets present            db_dsn present for 3 services
+        PF19  PASS  No interrupted release             no release in progress
+        PF20  PASS  Release is newer than running      1.1.9 -> 1.1.10
+        03:27:08.332  start                     release 1.1.10 (previous 1.1.9), signed by fcfc0b2f0789e16a
+        03:27:08.383  migrated                  schema 4 -> 4
+        03:27:08.412  rollout    catalog-api    v1.1.0 eefd53cce126 x3
+        03:27:30.394  healthy    catalog-api    job version 57 in 21.964s
+        03:27:30.424  rollout    edge-gateway   v1.1.0 ae75fe7e4c30 x3
+        03:27:32.017  failed     edge-gateway   task edge-gateway on node3 restarted: Driver Failure: Failed to pull `registry:5000/edge-gateway@sha256:ae75fe7e4c300c99c3755bb42d0be15da9b737aa64e2f60dfe1b66b6f78d2ac4`: Error response from daemon: failed to resolve reference "registry:5000/edge-gateway@sha256:ae75fe7e4c300c99c3755bb42d0be15da9b737aa64e2f60dfe1b66b6f78d2ac4": registry:5000/edge-gateway@sha256:ae75fe7e4c300c99c3755bb42d0be15da9b737aa64e2f60dfe1b66b6f78d2ac4: not found (after 1.566s)
+        03:27:32.043  rollback   edge-gateway   to v1.1.0 (release 1.1.9)
+        03:27:42.450  restored   edge-gateway   v1.1.0 healthy in 10.407s
+        03:27:42.459  rollback   catalog-api    to v1.1.0 (release 1.1.9)
+        03:27:48.794  restored   catalog-api    v1.1.0 healthy in 6.334s
+        03:27:48.801  restored                  previous release 1.1.9 healthy 16.8s after failure was detected
+        03:27:48.820  rolled_back                task edge-gateway on node3 restarted: Driver Failure: Failed to pull `registry:5000/edge-gateway@sha256:ae75fe7e4c300c99c3755bb42d0be15da9b737aa64e2f60dfe1b66b6f78d2ac4`: Error response from daemon: failed to resolve reference "registry:5000/edge-gateway@sha256:ae75fe7e4c300c99c3755bb42d0be15da9b737aa64e2f60dfe1b66b6f78d2ac4": registry:5000/edge-gateway@sha256:ae75fe7e4c300c99c3755bb42d0be15da9b737aa64e2f60dfe1b66b6f78d2ac4: not found
+        
+        deploy 1.1.10: ROLLED_BACK (task edge-gateway on node3 restarted: Driver Failure: Failed to pull `registry:5000/edge-gateway@sha256:ae75fe7e4c300c99c3755bb42d0be15da9b737aa64e2f60dfe1b66b6f78d2ac4`: Error response from daemon: failed to resolve reference "registry:5000/edge-gateway@sha256:ae75fe7e4c300c99c3755bb42d0be15da9b737aa64e2f60dfe1b66b6f78d2ac4": registry:5000/edge-gateway@sha256:ae75fe7e4c300c99c3755bb42d0be15da9b737aa64e2f60dfe1b66b6f78d2ac4: not found)
+        rollback: previous release healthy 16.8s after failure detected (18.4s after the bad rollout began)
+        relctl: release 1.1.10 rolled back: task edge-gateway on node3 restarted: Driver Failure: Failed to pull `registry:5000/edge-gateway@sha256:ae75fe7e4c300c99c3755bb42d0be15da9b737aa64e2f60dfe1b66b6f78d2ac4`: Error response from daemon: failed to resolve reference "registry:5000/edge-gateway@sha256:ae75fe7e4c300c99c3755bb42d0be15da9b737aa64e2f60dfe1b66b6f78d2ac4": registry:5000/edge-gateway@sha256:ae75fe7e4c300c99c3755bb42d0be15da9b737aa64e2f60dfe1b66b6f78d2ac4: not found
+    harness_test.go:173: failure: task edge-gateway on node3 restarted: Driver Failure: Failed to pull `registry:5000/edge-gateway@sha256:ae75fe7e4c300c99c3755bb42d0be15da9b737aa64e2f60dfe1b66b6f78d2ac4`: Error response from daemon: failed to resolve reference "registry:5000/edge-gateway@sha256:ae75fe7e4c300c99c3755bb42d0be15da9b737aa64e2f60dfe1b66b6f78d2ac4": registry:5000/edge-gateway@sha256:ae75fe7e4c300c99c3755bb42d0be15da9b737aa64e2f60dfe1b66b6f78d2ac4: not found
+    harness_test.go:173: rollback 16.8s after detection, 18.4s after the bad rollout began
+--- PASS: TestR10ImageVanishesMidRollout (44.32s)
+=== RUN   TestR11RegistryDownMidRollout
+    scenarios_test.go:249: === R11 Registry goes down mid-rollout; rollback works from node image caches
+    harness_test.go:173: registry stopped 0.5s into the catalog-api rollout
+    scenarios_test.go:257: background deploy:
+        PF08  PASS  MySQL reachable                    MySQL 8.4.13 at mysql:3306
+        PF09  PASS  Migration user privileges          relctl has ALL PRIVILEGES on app
+        PF10  PASS  No dirty migration                 no dirty migrations
+        PF11  PASS  Applied migrations match release   4 applied migrations match
+        PF12  PASS  Schema not ahead of release        schema 4 -> 4
+        PF13  PASS  No out-of-band schema change       schema matches snapshot 629fe2cd5777 (v4)
+        PF14  PASS  Rollback stays possible            running release 1.1.9 accepts schema 4
+        PF15  PASS  Services accept target schema      every service accepts schema 4
+        PF16  PASS  No long transactions or table locks no transaction older than 10s, no table locks
+        PF17  PASS  Running release healthy            9 allocations of 1.1.9 passing checks
+        PF18  PASS  Service secrets present            db_dsn present for 3 services
+        PF19  PASS  No interrupted release             no release in progress
+        PF20  PASS  Release is newer than running      1.1.9 -> 1.1.10
+        03:27:52.062  start                     release 1.1.10 (previous 1.1.9), signed by fcfc0b2f0789e16a
+        03:27:52.112  migrated                  schema 4 -> 4
+        03:27:52.145  rollout    catalog-api    v1.1.0 0a95a79c8521 x3
+        03:28:01.087  failed     catalog-api    task catalog-api on node2 restarted: Driver Failure: Failed to pull `registry:5000/catalog-api@sha256:0a95a79c852158dd999f480311661c14dc23be0470f78d8072c87b82c025407b`: Error response from daemon: failed to resolve reference "registry:5000/catalog-api@sha256:0a95a79c852158dd999f480311661c14dc23be0470f78d8072c87b82c025407b": failed to do request: Head "https://registry:5000/v2/catalog-api/manifests/sha256:0a95a79c852158dd999f480311661c14dc23be0470f78d8072c87b82c025407b": dial tcp: lookup registry on 127.0.0.11:53: server misbehaving (after 8.905s)
+        03:28:01.117  rollback   catalog-api    to v1.1.0 (release 1.1.9)
+        03:28:11.588  restored   catalog-api    v1.1.0 healthy in 10.471s
+        03:28:11.597  restored                  previous release 1.1.9 healthy 10.5s after failure was detected
+        03:28:11.628  rolled_back                task catalog-api on node2 restarted: Driver Failure: Failed to pull `registry:5000/catalog-api@sha256:0a95a79c852158dd999f480311661c14dc23be0470f78d8072c87b82c025407b`: Error response from daemon: failed to resolve reference "registry:5000/catalog-api@sha256:0a95a79c852158dd999f480311661c14dc23be0470f78d8072c87b82c025407b": failed to do request: Head "https://registry:5000/v2/catalog-api/manifests/sha256:0a95a79c852158dd999f480311661c14dc23be0470f78d8072c87b82c025407b": dial tcp: lookup registry on 127.0.0.11:53: server misbehaving
+        
+        deploy 1.1.10: ROLLED_BACK (task catalog-api on node2 restarted: Driver Failure: Failed to pull `registry:5000/catalog-api@sha256:0a95a79c852158dd999f480311661c14dc23be0470f78d8072c87b82c025407b`: Error response from daemon: failed to resolve reference "registry:5000/catalog-api@sha256:0a95a79c852158dd999f480311661c14dc23be0470f78d8072c87b82c025407b": failed to do request: Head "https://registry:5000/v2/catalog-api/manifests/sha256:0a95a79c852158dd999f480311661c14dc23be0470f78d8072c87b82c025407b": dial tcp: lookup registry on 127.0.0.11:53: server misbehaving)
+        rollback: previous release healthy 10.5s after failure detected (19.4s after the bad rollout began)
+        relctl: release 1.1.10 rolled back: task catalog-api on node2 restarted: Driver Failure: Failed to pull `registry:5000/catalog-api@sha256:0a95a79c852158dd999f480311661c14dc23be0470f78d8072c87b82c025407b`: Error response from daemon: failed to resolve reference "registry:5000/catalog-api@sha256:0a95a79c852158dd999f480311661c14dc23be0470f78d8072c87b82c025407b": failed to do request: Head "https://registry:5000/v2/catalog-api/manifests/sha256:0a95a79c852158dd999f480311661c14dc23be0470f78d8072c87b82c025407b": dial tcp: lookup registry on 127.0.0.11:53: server misbehaving
+    harness_test.go:173: rolled back: task catalog-api on node2 restarted: Driver Failure: Failed to pull `registry:5000/catalog-api@sha256:0a95a79c852158dd999f480311661c14dc23be0470f78d8072c87b82c025407b`: Error response from daemon: failed to resolve reference "registry:5000/catalog-api@sha256:0a95a79c852158dd999f480311661c14dc23be0470f78d8072c87b82c025407b": failed to do request: Head "https://registry:5000/v2/catalog-api/manifests/sha256:0a95a79c852158dd999f480311661c14dc23be0470f78d8072c87b82c025407b": dial tcp: lookup registry on 127.0.0.11:53: server misbehaving
+    harness_test.go:173: rollback 10.5s after detection, 19.4s after the bad rollout began, registry still down
+--- PASS: TestR11RegistryDownMidRollout (22.78s)
+=== RUN   TestR12NodeLostMidRollout
+    scenarios_test.go:287: === R12 A node dies mid-rollout
+    harness_test.go:173: node3 killed during the catalog-api rollout
+    scenarios_test.go:294: background deploy:
+        PF08  PASS  MySQL reachable                    MySQL 8.4.13 at mysql:3306
+        PF09  PASS  Migration user privileges          relctl has ALL PRIVILEGES on app
+        PF10  PASS  No dirty migration                 no dirty migrations
+        PF11  PASS  Applied migrations match release   4 applied migrations match
+        PF12  PASS  Schema not ahead of release        schema 4 -> 4
+        PF13  PASS  No out-of-band schema change       schema matches snapshot 629fe2cd5777 (v4)
+        PF14  PASS  Rollback stays possible            running release 1.1.9 accepts schema 4
+        PF15  PASS  Services accept target schema      every service accepts schema 4
+        PF16  PASS  No long transactions or table locks no transaction older than 10s, no table locks
+        PF17  PASS  Running release healthy            9 allocations of 1.1.9 passing checks
+        PF18  PASS  Service secrets present            db_dsn present for 3 services
+        PF19  PASS  No interrupted release             no release in progress
+        PF20  PASS  Release is newer than running      1.1.9 -> 1.1.10
+        03:28:14.226  start                     release 1.1.10 (previous 1.1.9), signed by fcfc0b2f0789e16a
+        03:28:14.262  migrated                  schema 4 -> 4
+        03:28:14.298  rollout    catalog-api    v1.1.0 3dcdad015df1 x3
+        03:28:51.904  healthy    catalog-api    job version 61 in 37.579s
+        03:28:51.922  rollout    edge-gateway   v1.1.0 9138e1f03abc x3
+        03:29:10.591  healthy    edge-gateway   job version 34 in 18.641s
+        03:29:10.611  rollout    order-worker   v1.1.0 eb48c2bef299 x3
+        03:29:29.657  healthy    order-worker   job version 19 in 19.019s
+        03:29:29.717  verified                  9 allocations run the signed binaries
+        03:29:29.732  succeeded                 
+        
+        deploy 1.1.10: SUCCEEDED
+    harness_test.go:173: release completed on the two remaining nodes
+    harness_test.go:173: all 9 allocations healthy on node1 and node2 with node3 down
+--- PASS: TestR12NodeLostMidRollout (78.23s)
+=== RUN   TestR13NodeDrainedMidRollout
+    scenarios_test.go:318: === R13 A node is drained mid-rollout
+    harness_test.go:173: node2 drained during the catalog-api rollout
+    scenarios_test.go:328: background deploy:
+        PF08  PASS  MySQL reachable                    MySQL 8.4.13 at mysql:3306
+        PF09  PASS  Migration user privileges          relctl has ALL PRIVILEGES on app
+        PF10  PASS  No dirty migration                 no dirty migrations
+        PF11  PASS  Applied migrations match release   4 applied migrations match
+        PF12  PASS  Schema not ahead of release        schema 4 -> 4
+        PF13  PASS  No out-of-band schema change       schema matches snapshot 629fe2cd5777 (v4)
+        PF14  PASS  Rollback stays possible            running release 1.1.10 accepts schema 4
+        PF15  PASS  Services accept target schema      every service accepts schema 4
+        PF16  PASS  No long transactions or table locks no transaction older than 10s, no table locks
+        PF17  PASS  Running release healthy            9 allocations of 1.1.10 passing checks
+        PF18  PASS  Service secrets present            db_dsn present for 3 services
+        PF19  PASS  No interrupted release             no release in progress
+        PF20  PASS  Release is newer than running      1.1.10 -> 1.1.11
+        03:29:42.219  start                     release 1.1.11 (previous 1.1.10), signed by fcfc0b2f0789e16a
+        03:29:42.286  migrated                  schema 4 -> 4
+        03:29:42.336  rollout    catalog-api    v1.1.0 3dcdad015df1 x3
+        03:29:55.952  healthy    catalog-api    job version 62 in 13.594s
+        03:29:55.973  rollout    edge-gateway   v1.1.0 9138e1f03abc x3
+        03:30:14.660  healthy    edge-gateway   job version 35 in 18.667s
+        03:30:14.677  rollout    order-worker   v1.1.0 eb48c2bef299 x3
+        03:30:33.234  healthy    order-worker   job version 20 in 18.539s
+        03:30:33.305  verified                  9 allocations run the signed binaries
+        03:30:33.325  succeeded                 
+        
+        deploy 1.1.11: SUCCEEDED
+    harness_test.go:173: deploy succeeded
+    harness_test.go:173: converged on 1.1.11 with node2 drained
+--- PASS: TestR13NodeDrainedMidRollout (63.74s)
+=== RUN   TestR14NomadServerRestart
+    scenarios_test.go:352: === R14 Nomad server restarts mid-rollout
+    harness_test.go:173: Nomad server restarted during the catalog-api rollout
+    scenarios_test.go:358: background deploy:
+        PF08  PASS  MySQL reachable                    MySQL 8.4.13 at mysql:3306
+        PF09  PASS  Migration user privileges          relctl has ALL PRIVILEGES on app
+        PF10  PASS  No dirty migration                 no dirty migrations
+        PF11  PASS  Applied migrations match release   4 applied migrations match
+        PF12  PASS  Schema not ahead of release        schema 4 -> 4
+        PF13  PASS  No out-of-band schema change       schema matches snapshot 629fe2cd5777 (v4)
+        PF14  PASS  Rollback stays possible            running release 1.1.11 accepts schema 4
+        PF15  PASS  Services accept target schema      every service accepts schema 4
+        PF16  PASS  No long transactions or table locks no transaction older than 10s, no table locks
+        PF17  PASS  Running release healthy            9 allocations of 1.1.11 passing checks
+        PF18  PASS  Service secrets present            db_dsn present for 3 services
+        PF19  PASS  No interrupted release             no release in progress
+        PF20  PASS  Release is newer than running      1.1.11 -> 1.1.12
+        03:30:36.914  start                     release 1.1.12 (previous 1.1.11), signed by fcfc0b2f0789e16a
+        03:30:36.963  migrated                  schema 4 -> 4
+        03:30:36.999  rollout    catalog-api    v1.1.0 3dcdad015df1 x3
+        03:31:06.514  healthy    catalog-api    job version 63 in 29.491s
+        03:31:06.534  rollout    edge-gateway   v1.1.0 9138e1f03abc x3
+        03:31:25.196  healthy    edge-gateway   job version 36 in 18.639s
+        03:31:25.211  rollout    order-worker   v1.1.0 eb48c2bef299 x3
+        03:31:43.705  healthy    order-worker   job version 21 in 18.481s
+        03:31:43.771  verified                  9 allocations run the signed binaries
+        03:31:43.787  succeeded                 
+        
+        deploy 1.1.12: SUCCEEDED
+    harness_test.go:173: deploy succeeded
+--- PASS: TestR14NomadServerRestart (70.20s)
+=== RUN   TestR15MySQLRestart
+    scenarios_test.go:372: === R15 MySQL restarts mid-rollout
+    harness_test.go:173: MySQL restarted during the catalog-api rollout
+    scenarios_test.go:378: background deploy:
+        PF09  PASS  Migration user privileges          relctl has ALL PRIVILEGES on app
+        PF10  PASS  No dirty migration                 no dirty migrations
+        PF11  PASS  Applied migrations match release   4 applied migrations match
+        PF12  PASS  Schema not ahead of release        schema 4 -> 4
+        PF13  PASS  No out-of-band schema change       schema matches snapshot 629fe2cd5777 (v4)
+        PF14  PASS  Rollback stays possible            running release 1.1.12 accepts schema 4
+        PF15  PASS  Services accept target schema      every service accepts schema 4
+        PF16  PASS  No long transactions or table locks no transaction older than 10s, no table locks
+        PF17  PASS  Running release healthy            9 allocations of 1.1.12 passing checks
+        PF18  PASS  Service secrets present            db_dsn present for 3 services
+        PF19  PASS  No interrupted release             no release in progress
+        PF20  PASS  Release is newer than running      1.1.12 -> 1.1.13
+        03:31:45.962  start                     release 1.1.13 (previous 1.1.12), signed by fcfc0b2f0789e16a
+        03:31:45.995  migrated                  schema 4 -> 4
+        03:31:46.019  rollout    catalog-api    v1.1.0 3dcdad015df1 x3
+        [mysql] 2025/06/16 03:31:54 connection.go:808 closing bad idle connection: EOF
+        03:32:04.259  healthy    catalog-api    job version 64 in 18.221s
+        03:32:04.274  rollout    edge-gateway   v1.1.0 9138e1f03abc x3
+        03:32:22.256  healthy    edge-gateway   job version 37 in 17.968s
+        03:32:22.261  rollout    order-worker   v1.1.0 eb48c2bef299 x3
+        03:32:40.178  healthy    order-worker   job version 22 in 17.913s
+        03:32:40.217  verified                  9 allocations run the signed binaries
+        03:32:40.220  succeeded                 
+        
+        deploy 1.1.13: SUCCEEDED
+    harness_test.go:173: deploy succeeded
+[mysql] 2025/06/16 03:32:40 connection.go:808 closing bad idle connection: EOF
+[mysql] 2025/06/16 03:32:40 packets.go:155 write tcp 172.19.0.8:56378->172.19.0.3:3306: write: broken pipe
+--- PASS: TestR15MySQLRestart (56.31s)
+=== RUN   TestR16ControllerKilledMidRollout
+    scenarios_test.go:394: === R16 Controller killed mid-rollout; reconcile restores the last good release
+    scenarios_test.go:399: controller killed; its log:
+        PF11  PASS  Applied migrations match release   4 applied migrations match
+        PF12  PASS  Schema not ahead of release        schema 4 -> 4
+        PF13  PASS  No out-of-band schema change       schema matches snapshot 629fe2cd5777 (v4)
+        PF14  PASS  Rollback stays possible            running release 1.1.13 accepts schema 4
+        PF15  PASS  Services accept target schema      every service accepts schema 4
+        PF16  PASS  No long transactions or table locks no transaction older than 10s, no table locks
+        PF17  PASS  Running release healthy            9 allocations of 1.1.13 passing checks
+        PF18  PASS  Service secrets present            db_dsn present for 3 services
+        PF19  PASS  No interrupted release             no release in progress
+        PF20  PASS  Release is newer than running      1.1.13 -> 1.1.14
+        03:32:42.031  start                     release 1.1.14 (previous 1.1.13), signed by fcfc0b2f0789e16a
+        03:32:42.037  migrated                  schema 4 -> 4
+        03:32:42.043  rollout    catalog-api    v1.1.0 3dcdad015df1 x3
+        03:32:59.299  healthy    catalog-api    job version 65 in 17.253s
+        03:32:59.302  rollout    edge-gateway   v1.1.0 9138e1f03abc x3
+    harness_test.go:173: controller SIGKILLed during the edge-gateway rollout (catalog-api already upgraded)
+    scenarios_test.go:404: deploy next: exit 6
+        
+        deploy : LOCKED (another release holds the deploy lock (owner 401dadce0ecc/32918/c5404728))
+        relctl: another release holds the deploy lock (owner 401dadce0ecc/32918/c5404728)
+    harness_test.go:173: a new deploy was refused (locked)
+    harness_test.go:173: reconcile restored 1.1.13 25.9s after it was started (including waiting out the 15s lease)
+    harness_test.go:173: interrupted release marked "reconciled"
+--- PASS: TestR16ControllerKilledMidRollout (49.43s)
+=== RUN   TestR17ControllerKilledMidRollback
+    scenarios_test.go:431: === R17 Controller killed while rolling back; reconcile finishes the job
+    scenarios_test.go:435: controller killed; its log:
+        PF13  PASS  No out-of-band schema change       schema matches snapshot 629fe2cd5777 (v4)
+        PF14  PASS  Rollback stays possible            running release 1.1.13 accepts schema 4
+        PF15  PASS  Services accept target schema      every service accepts schema 4
+        PF16  PASS  No long transactions or table locks no transaction older than 10s, no table locks
+        PF17  PASS  Running release healthy            9 allocations of 1.1.13 passing checks
+        PF18  PASS  Service secrets present            db_dsn present for 3 services
+        PF19  PASS  No interrupted release             no release in progress
+        PF20  PASS  Release is newer than running      1.1.13 -> 1.1.14
+        03:33:31.364  start                     release 1.1.14 (previous 1.1.13), signed by fcfc0b2f0789e16a
+        03:33:31.411  migrated                  schema 4 -> 4
+        03:33:31.434  rollout    catalog-api    v1.1.0 3dcdad015df1 x3
+        03:33:50.217  healthy    catalog-api    job version 67 in 18.757s
+        03:33:50.246  rollout    edge-gateway   v1.1.0 9138e1f03abc x3
+        03:33:51.855  failed     edge-gateway   task edge-gateway on node2 restarted: Terminated: Exit Code: 3, Exit Message: "Docker container exited with non-zero exit code: 3" (after 1.573s)
+        03:33:51.886  rollback   edge-gateway   to v1.1.0 (release 1.1.13)
+    harness_test.go:173: controller SIGKILLed as soon as it started rolling back
+    harness_test.go:173: back on 1.1.13 21.8s after reconcile started
+--- PASS: TestR17ControllerKilledMidRollback (43.92s)
+=== RUN   TestR18ConcurrentDeploys
+    scenarios_test.go:455: === R18 Two controllers deploy at once; the lock admits one
+    scenarios_test.go:458: deploy b: exit 6
+        
+        deploy : LOCKED (another release holds the deploy lock (owner 401dadce0ecc/34678/e89bb660))
+        relctl: another release holds the deploy lock (owner 401dadce0ecc/34678/e89bb660)
+    harness_test.go:173: second deploy refused: another release holds the deploy lock (owner 401dadce0ecc/34678/e89bb660)
+    scenarios_test.go:463: background deploy:
+        PF06  PASS  Enough ready Docker nodes          3 nodes ready [node1,node2,node3]
+        PF07  PASS  Nomad can place every service      all 3 jobs placeable
+        PF08  PASS  MySQL reachable                    MySQL 8.4.13 at mysql:3306
+        PF09  PASS  Migration user privileges          relctl has ALL PRIVILEGES on app
+        PF10  PASS  No dirty migration                 no dirty migrations
+        PF11  PASS  Applied migrations match release   4 applied migrations match
+        PF12  PASS  Schema not ahead of release        schema 4 -> 4
+        PF13  PASS  No out-of-band schema change       schema matches snapshot 629fe2cd5777 (v4)
+        PF14  PASS  Rollback stays possible            running release 1.1.13 accepts schema 4
+        PF15  PASS  Services accept target schema      every service accepts schema 4
+        PF16  PASS  No long transactions or table locks no transaction older than 10s, no table locks
+        PF17  PASS  Running release healthy            9 allocations of 1.1.13 passing checks
+        PF18  PASS  Service secrets present            db_dsn present for 3 services
+        PF19  PASS  No interrupted release             no release in progress
+        PF20  PASS  Release is newer than running      1.1.13 -> 1.1.14
+        03:34:14.995  start                     release 1.1.14 (previous 1.1.13), signed by fcfc0b2f0789e16a
+        03:34:15.045  migrated                  schema 4 -> 4
+        03:34:15.059  unchanged  catalog-api    v1.1.0 already running
+        03:34:15.080  unchanged  order-worker   v1.1.0 already running
+        03:34:15.101  rollout    edge-gateway   v1.1.0 9138e1f03abc x3
+        03:34:33.987  healthy    edge-gateway   job version 42 in 18.864s
+        03:34:34.027  verified                  3 allocations run the signed binaries
+        03:34:34.050  succeeded                 
+        
+        deploy 1.1.14: SUCCEEDED
+--- PASS: TestR18ConcurrentDeploys (20.57s)
+=== RUN   TestR19MigrationFailsPartWay
+    scenarios_test.go:474: === R19 Migration fails half way; release aborts before any service changes, then repair
+    scenarios_test.go:490: deploy bad: exit 1
+        PF01  PASS  Manifest signature                 ed25519 signature by fcfc0b2f0789e16a verifies
+        PF02  PASS  Manifest is well-formed            3 services, order: catalog-api edge-gateway order-worker
+        PF03  PASS  Bundle artifact checksums          9 files match the signed checksums
+        PF04  PASS  Image digests resolvable           3 images resolve by digest
+        PF05  PASS  Nomad has a leader                 leader 172.19.0.2:4647
+        PF06  PASS  Enough ready Docker nodes          3 nodes ready [node1,node2,node3]
+        PF07  PASS  Nomad can place every service      all 3 jobs placeable
+        PF08  PASS  MySQL reachable                    MySQL 8.4.13 at mysql:3306
+        PF09  PASS  Migration user privileges          relctl has ALL PRIVILEGES on app
+        PF10  PASS  No dirty migration                 no dirty migrations
+        PF11  PASS  Applied migrations match release   4 applied migrations match
+        PF12  PASS  Schema not ahead of release        schema 4 -> 5
+        PF13  PASS  No out-of-band schema change       schema matches snapshot 629fe2cd5777 (v4)
+        PF14  PASS  Rollback stays possible            running release 1.1.14 accepts schema 5
+        PF15  PASS  Services accept target schema      every service accepts schema 5
+        PF16  PASS  No long transactions or table locks no transaction older than 10s, no table locks
+        PF17  PASS  Running release healthy            9 allocations of 1.1.14 passing checks
+        PF18  PASS  Service secrets present            db_dsn present for 3 services
+        PF19  PASS  No interrupted release             no release in progress
+        PF20  PASS  Release is newer than running      1.1.14 -> 1.1.15
+        03:34:35.689  start                     release 1.1.15 (previous 1.1.14), signed by fcfc0b2f0789e16a
+        03:34:35.816  aborted                   migration: migration 5 create_audit_log failed, schema left dirty: Error 1067 (42000): Invalid default value for 'broken'
+        
+        deploy 1.1.15: ABORTED (migration: migration 5 create_audit_log failed, schema left dirty: Error 1067 (42000): Invalid default value for 'broken')
+        relctl: migration 5 create_audit_log failed, schema left dirty: Error 1067 (42000): Invalid default value for 'broken'
+    harness_test.go:173: aborted: migration: migration 5 create_audit_log failed, schema left dirty: Error 1067 (42000): Invalid default value for 'broken'
+    harness_test.go:173: no service job changed
+    scenarios_test.go:504: deploy next: exit 3
+        ID    RESULT CHECK                              DETAIL
+        PF01  PASS  Manifest signature                 ed25519 signature by fcfc0b2f0789e16a verifies
+        PF02  PASS  Manifest is well-formed            3 services, order: catalog-api edge-gateway order-worker
+        PF03  PASS  Bundle artifact checksums          8 files match the signed checksums
+        PF04  PASS  Image digests resolvable           3 images resolve by digest
+        PF05  PASS  Nomad has a leader                 leader 172.19.0.2:4647
+        PF06  PASS  Enough ready Docker nodes          3 nodes ready [node1,node2,node3]
+        PF07  PASS  Nomad can place every service      all 3 jobs placeable
+        PF08  PASS  MySQL reachable                    MySQL 8.4.13 at mysql:3306
+        PF09  PASS  Migration user privileges          relctl has ALL PRIVILEGES on app
+        PF10  FAIL  No dirty migration                 migration 5 create_audit_log failed part way and left the schema dirty; repair it before deploying
+        PF11  PASS  Applied migrations match release   4 applied migrations match
+        PF12  FAIL  Schema not ahead of release        database is at schema 5 but this release targets 4
+        PF13  SKIP  No out-of-band schema change       skipped: PF10 did not pass
+        PF14  PASS  Rollback stays possible            running release 1.1.14 accepts schema 4
+        PF15  PASS  Services accept target schema      every service accepts schema 4
+        PF16  PASS  No long transactions or table locks no transaction older than 10s, no table locks
+        PF17  PASS  Running release healthy            9 allocations of 1.1.14 passing checks
+        PF18  PASS  Service secrets present            db_dsn present for 3 services
+        PF19  PASS  No interrupted release             no release in progress
+        PF20  PASS  Release is newer than running      1.1.14 -> 1.1.15
+        
+        deploy : BLOCKED (preflight failed: PF10, PF12)
+        relctl: preflight failed: PF10, PF12
+    harness_test.go:173: next deploy blocked by [PF10 PF12]
+    harness_test.go:173: operator dropped the half-created table and ran `relctl migrate repair --version 5 --drop`
+    scenarios_test.go:513: deploy fixed: exit 0
+        PF08  PASS  MySQL reachable                    MySQL 8.4.13 at mysql:3306
+        PF09  PASS  Migration user privileges          relctl has ALL PRIVILEGES on app
+        PF10  PASS  No dirty migration                 no dirty migrations
+        PF11  PASS  Applied migrations match release   4 applied migrations match
+        PF12  PASS  Schema not ahead of release        schema 4 -> 4
+        PF13  PASS  No out-of-band schema change       schema matches snapshot 629fe2cd5777 (v4)
+        PF14  PASS  Rollback stays possible            running release 1.1.14 accepts schema 4
+        PF15  PASS  Services accept target schema      every service accepts schema 4
+        PF16  PASS  No long transactions or table locks no transaction older than 10s, no table locks
+        PF17  PASS  Running release healthy            9 allocations of 1.1.14 passing checks
+        PF18  PASS  Service secrets present            db_dsn present for 3 services
+        PF19  PASS  No interrupted release             no release in progress
+        PF20  PASS  Release is newer than running      1.1.14 -> 1.1.15
+        03:34:37.807  start                     release 1.1.15 (previous 1.1.14), signed by fcfc0b2f0789e16a
+        03:34:37.845  migrated                  schema 4 -> 4
+        03:34:37.868  rollout    catalog-api    v1.1.0 3dcdad015df1 x3
+        03:34:56.346  healthy    catalog-api    job version 69 in 18.459s
+        03:34:56.365  rollout    edge-gateway   v1.1.0 9138e1f03abc x3
+        03:35:15.242  healthy    edge-gateway   job version 43 in 18.857s
+        03:35:15.265  rollout    order-worker   v1.1.0 eb48c2bef299 x3
+        03:35:34.048  healthy    order-worker   job version 23 in 18.759s
+        03:35:34.107  verified                  9 allocations run the signed binaries
+        03:35:34.137  succeeded                 
+        
+        deploy 1.1.15: SUCCEEDED
+    harness_test.go:173: 1.1.15 deployed after repair (previous good release was 1.1.14)
+--- PASS: TestR19MigrationFailsPartWay (60.10s)
+=== RUN   TestR20NewServiceFirstDeployFails
+    scenarios_test.go:524: === R20 A brand-new service fails its first deploy; it is removed, the rest untouched
+    scenarios_test.go:528: deploy bad: exit 4
+        PF10  PASS  No dirty migration                 no dirty migrations
+        PF11  PASS  Applied migrations match release   4 applied migrations match
+        PF12  PASS  Schema not ahead of release        schema 4 -> 4
+        PF13  PASS  No out-of-band schema change       schema matches snapshot 629fe2cd5777 (v4)
+        PF14  PASS  Rollback stays possible            running release 1.1.15 accepts schema 4
+        PF15  PASS  Services accept target schema      every service accepts schema 4
+        PF16  PASS  No long transactions or table locks no transaction older than 10s, no table locks
+        PF17  PASS  Running release healthy            9 allocations of 1.1.15 passing checks
+        PF18  PASS  Service secrets present            db_dsn present for 4 services
+        PF19  PASS  No interrupted release             no release in progress
+        PF20  PASS  Release is newer than running      1.1.15 -> 1.1.16
+        03:35:35.947  start                     release 1.1.16 (previous 1.1.15), signed by fcfc0b2f0789e16a
+        03:35:36.001  migrated                  schema 4 -> 4
+        03:35:36.017  unchanged  catalog-api    v1.1.0 already running
+        03:35:36.033  unchanged  edge-gateway   v1.1.0 already running
+        03:35:36.042  unchanged  order-worker   v1.1.0 already running
+        03:35:36.064  rollout    report-worker  v1.1.0 eb48c2bef299 x3
+        03:35:37.597  failed     report-worker  task report-worker on node2 restarted: Terminated: Exit Code: 3, Exit Message: "Docker container exited with non-zero exit code: 3" (after 1.505s)
+        03:35:37.620  stop       report-worker  no previous version; stopping
+        03:35:38.139  restored                  previous release 1.1.15 healthy 0.6s after failure was detected
+        03:35:38.168  rolled_back                task report-worker on node2 restarted: Terminated: Exit Code: 3, Exit Message: "Docker container exited with non-zero exit code: 3"
+        
+        deploy 1.1.16: ROLLED_BACK (task report-worker on node2 restarted: Terminated: Exit Code: 3, Exit Message: "Docker container exited with non-zero exit code: 3")
+        rollback: previous release healthy 0.6s after failure detected (2.1s after the bad rollout began)
+        relctl: release 1.1.16 rolled back: task report-worker on node2 restarted: Terminated: Exit Code: 3, Exit Message: "Docker container exited with non-zero exit code: 3"
+    harness_test.go:173: failure: task report-worker on node2 restarted: Terminated: Exit Code: 3, Exit Message: "Docker container exited with non-zero exit code: 3"
+    harness_test.go:173: rollback 0.6s after detection, 2.1s after the bad rollout began
+    harness_test.go:173: report-worker stopped; no other service touched
+--- PASS: TestR20NewServiceFirstDeployFails (4.05s)
+=== RUN   TestR21OperatorRollback
+    scenarios_test.go:551: === R21 Operator rolls back a release that deployed fine
+    scenarios_test.go:553: deploy good: exit 0
+        PF08  PASS  MySQL reachable                    MySQL 8.4.13 at mysql:3306
+        PF09  PASS  Migration user privileges          relctl has ALL PRIVILEGES on app
+        PF10  PASS  No dirty migration                 no dirty migrations
+        PF11  PASS  Applied migrations match release   4 applied migrations match
+        PF12  PASS  Schema not ahead of release        schema 4 -> 4
+        PF13  PASS  No out-of-band schema change       schema matches snapshot 629fe2cd5777 (v4)
+        PF14  PASS  Rollback stays possible            running release 1.1.15 accepts schema 4
+        PF15  PASS  Services accept target schema      every service accepts schema 4
+        PF16  PASS  No long transactions or table locks no transaction older than 10s, no table locks
+        PF17  PASS  Running release healthy            9 allocations of 1.1.15 passing checks
+        PF18  PASS  Service secrets present            db_dsn present for 3 services
+        PF19  PASS  No interrupted release             no release in progress
+        PF20  PASS  Release is newer than running      1.1.15 -> 1.1.16
+        03:35:39.846  start                     release 1.1.16 (previous 1.1.15), signed by fcfc0b2f0789e16a
+        03:35:39.891  migrated                  schema 4 -> 4
+        03:35:39.921  rollout    catalog-api    v1.1.0 3dcdad015df1 x3
+        03:35:58.433  healthy    catalog-api    job version 70 in 18.487s
+        03:35:58.459  rollout    edge-gateway   v1.1.0 9138e1f03abc x3
+        03:36:17.439  healthy    edge-gateway   job version 44 in 18.955s
+        03:36:17.464  rollout    order-worker   v1.1.0 eb48c2bef299 x3
+        03:36:35.958  healthy    order-worker   job version 24 in 18.465s
+        03:36:36.009  verified                  9 allocations run the signed binaries
+        03:36:36.012  succeeded                 
+        
+        deploy 1.1.16: SUCCEEDED
+    harness_test.go:173: all three services back on 1.1.15 in 18.3s
+--- PASS: TestR21OperatorRollback (76.24s)
+=== RUN   TestR22RollbackIdempotent
+    scenarios_test.go:581: === R22 Rolling back to the release already running changes nothing
+    harness_test.go:173: two `rollback --to 1.1.15` calls were no-ops; no job version changed
+--- PASS: TestR22RollbackIdempotent (0.50s)
+PASS
+
+25/25 recovery scenarios passed; rollback seconds map[max:21.3 min:0.6 n:13 p50:6.2 p95:18.3]; recovery seconds map[max:34.7 min:2.1 n:15 p50:18.4 p95:27.5]

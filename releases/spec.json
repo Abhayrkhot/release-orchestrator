@@ -1,0 +1,38 @@
+{
+  "registry": "registry:5000",
+  "services": [
+    {
+      "name": "catalog-api",
+      "count": 3,
+      "min_schema": 3,
+      "max_schema": 5,
+      "cpu": 100,
+      "memory_mb": 64,
+      "health_path": "/healthz"
+    },
+    {
+      "name": "order-worker",
+      "count": 3,
+      "depends_on": [
+        "catalog-api"
+      ],
+      "min_schema": 3,
+      "max_schema": 5,
+      "cpu": 100,
+      "memory_mb": 64,
+      "health_path": "/healthz"
+    },
+    {
+      "name": "edge-gateway",
+      "count": 3,
+      "depends_on": [
+        "catalog-api"
+      ],
+      "min_schema": 3,
+      "max_schema": 5,
+      "cpu": 100,
+      "memory_mb": 64,
+      "health_path": "/healthz"
+    }
+  ]
+}

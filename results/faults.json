@@ -1,0 +1,358 @@
+{
+  "caught": 22,
+  "total": 22,
+  "checks_exercised": [
+    "PF01",
+    "PF02",
+    "PF03",
+    "PF04",
+    "PF05",
+    "PF06",
+    "PF07",
+    "PF08",
+    "PF09",
+    "PF10",
+    "PF11",
+    "PF12",
+    "PF13",
+    "PF14",
+    "PF15",
+    "PF16",
+    "PF17",
+    "PF18",
+    "PF19",
+    "PF20"
+  ],
+  "faults": [
+    {
+      "id": "F01",
+      "fault": "Manifest edited after signing (catalog-api digest swapped)",
+      "expected": "PF01",
+      "caught": true,
+      "failed_checks": [
+        "PF01"
+      ],
+      "detail": "manifest changed after signing: sha256 f5a8fc9c6f6bf9fac0ea47780862a8116f89d7352d6c7f1eb42c52c78729e6cb, signature covers 9fbe3c72995a7b8b3ee53aa38e2d688804eda4ec48326e2be86a80e1fe8c9aa1",
+      "exit_code": 3,
+      "status": "blocked",
+      "cluster_unchanged": true,
+      "clean_after": true,
+      "ms": 654
+    },
+    {
+      "id": "F02",
+      "fault": "Manifest signed by a key that is not trusted",
+      "expected": "PF01",
+      "caught": true,
+      "failed_checks": [
+        "PF01"
+      ],
+      "detail": "signed by key 9316e0b6ee20a22f, which is not in the trust store",
+      "exit_code": 3,
+      "status": "blocked",
+      "cluster_unchanged": true,
+      "clean_after": true,
+      "ms": 635
+    },
+    {
+      "id": "F03",
+      "fault": "Service dependency cycle (catalog-api <-> order-worker)",
+      "expected": "PF02",
+      "caught": true,
+      "failed_checks": [
+        "PF02"
+      ],
+      "detail": "relctl: dependency cycle: cannot order catalog-api, edge-gateway, order-worker;",
+      "exit_code": 3,
+      "status": "blocked",
+      "cluster_unchanged": true,
+      "clean_after": true,
+      "ms": 868
+    },
+    {
+      "id": "F04",
+      "fault": "Migration file modified after signing",
+      "expected": "PF03",
+      "caught": true,
+      "failed_checks": [
+        "PF03"
+      ],
+      "detail": "migrations/0004_add_items_stock.up.sql sha256 a61303f52aaa != signed 39e6435a5db6; ",
+      "exit_code": 3,
+      "status": "blocked",
+      "cluster_unchanged": true,
+      "clean_after": true,
+      "ms": 974
+    },
+    {
+      "id": "F05",
+      "fault": "Image digest in manifest was never pushed",
+      "expected": "PF04",
+      "caught": true,
+      "failed_checks": [
+        "PF04"
+      ],
+      "detail": "not in registry: catalog-api catalog-api@95f02d8e4b57 -> HTTP 404; ",
+      "exit_code": 3,
+      "status": "blocked",
+      "cluster_unchanged": true,
+      "clean_after": true,
+      "ms": 939
+    },
+    {
+      "id": "F09",
+      "fault": "Service asks for more memory than any node has",
+      "expected": "PF07",
+      "caught": true,
+      "failed_checks": [
+        "PF07"
+      ],
+      "detail": "catalog-api catalog-api: 1 unplaceable (memory=3); ",
+      "exit_code": 3,
+      "status": "blocked",
+      "cluster_unchanged": true,
+      "clean_after": true,
+      "ms": 919
+    },
+    {
+      "id": "F16",
+      "fault": "Breaking migration: running release could not be rolled back to",
+      "expected": "PF14",
+      "caught": true,
+      "failed_checks": [
+        "PF14"
+      ],
+      "detail": "release migrates to schema 6 but the running catalog-api v1.1.0 reads schema <= 5,order-worker v1.1.0 reads schema <= 5,edge-gateway v1.1.0 reads schema <= 5: a rollback would leave it broken",
+      "exit_code": 3,
+      "status": "blocked",
+      "cluster_unchanged": true,
+      "clean_after": true,
+      "ms": 903
+    },
+    {
+      "id": "F17",
+      "fault": "Service needs a schema this release does not migrate to",
+      "expected": "PF15",
+      "caught": true,
+      "failed_checks": [
+        "PF15"
+      ],
+      "detail": "schema target 4 outside supported range: catalog-api v1.1.0 needs 5-6",
+      "exit_code": 3,
+      "status": "blocked",
+      "cluster_unchanged": true,
+      "clean_after": true,
+      "ms": 963
+    },
+    {
+      "id": "F22",
+      "fault": "Release older than the running one (accidental downgrade)",
+      "expected": "PF20",
+      "caught": true,
+      "failed_checks": [
+        "PF20"
+      ],
+      "detail": "0.0.1 is older than running 1.1.17; use relctl rollback, or --allow-downgrade",
+      "exit_code": 3,
+      "status": "blocked",
+      "cluster_unchanged": true,
+      "clean_after": true,
+      "ms": 967
+    },
+    {
+      "id": "F11",
+      "fault": "Migration user lost ALTER on the app schema",
+      "expected": "PF09",
+      "caught": true,
+      "failed_checks": [
+        "PF09"
+      ],
+      "detail": "relctl lacks ALTER on app; migrations would fail part way",
+      "exit_code": 3,
+      "status": "blocked",
+      "cluster_unchanged": true,
+      "clean_after": true,
+      "ms": 991
+    },
+    {
+      "id": "F12",
+      "fault": "Earlier migration failed part way (dirty flag set)",
+      "expected": "PF10",
+      "caught": true,
+      "failed_checks": [
+        "PF10"
+      ],
+      "detail": "migration 4 add_items_stock failed part way and left the schema dirty; repair it before deploying",
+      "exit_code": 3,
+      "status": "blocked",
+      "cluster_unchanged": true,
+      "clean_after": true,
+      "ms": 1012
+    },
+    {
+      "id": "F13",
+      "fault": "Applied migration differs from the one in the release",
+      "expected": "PF11",
+      "caught": true,
+      "failed_checks": [
+        "PF11"
+      ],
+      "detail": "migration 2 applied as 9b8d3a228af8, release has 01d33840bb09; ",
+      "exit_code": 3,
+      "status": "blocked",
+      "cluster_unchanged": true,
+      "clean_after": true,
+      "ms": 956
+    },
+    {
+      "id": "F14",
+      "fault": "Database already migrated past this release's schema",
+      "expected": "PF12",
+      "caught": true,
+      "failed_checks": [
+        "PF12"
+      ],
+      "detail": "database is at schema 5 but this release targets 4",
+      "exit_code": 3,
+      "status": "blocked",
+      "cluster_unchanged": true,
+      "clean_after": true,
+      "ms": 939
+    },
+    {
+      "id": "F15",
+      "fault": "Column added by hand, outside any migration",
+      "expected": "PF13",
+      "caught": true,
+      "failed_checks": [
+        "PF13"
+      ],
+      "detail": "live schema fingerprint e694937889d4 differs from 629fe2cd5777 recorded after migration 4: someone changed the schema outside a release",
+      "exit_code": 3,
+      "status": "blocked",
+      "cluster_unchanged": true,
+      "clean_after": true,
+      "ms": 911
+    },
+    {
+      "id": "F18",
+      "fault": "Long-running transaction holding locks a migration would wait on",
+      "expected": "PF16",
+      "caught": true,
+      "failed_checks": [
+        "PF16"
+      ],
+      "detail": "blocking: thread 1303 open 13s, 7 rows locked ",
+      "exit_code": 3,
+      "status": "blocked",
+      "cluster_unchanged": true,
+      "clean_after": true,
+      "ms": 958
+    },
+    {
+      "id": "F21",
+      "fault": "Earlier release interrupted mid-rollout, never reconciled",
+      "expected": "PF19",
+      "caught": true,
+      "failed_checks": [
+        "PF19"
+      ],
+      "detail": "release 1.1.18 (id 76) stopped at rollout:catalog-api; run relctl reconcile first",
+      "exit_code": 3,
+      "status": "blocked",
+      "cluster_unchanged": true,
+      "clean_after": true,
+      "ms": 1000
+    },
+    {
+      "id": "F08",
+      "fault": "A node is ineligible: only 2 of 3 required nodes",
+      "expected": "PF06",
+      "caught": true,
+      "failed_checks": [
+        "PF06"
+      ],
+      "detail": "2 of 3 required nodes ready+eligible with Docker [node1,node2]; not usable: [node3=ready/ineligible]",
+      "exit_code": 3,
+      "status": "blocked",
+      "cluster_unchanged": true,
+      "clean_after": true,
+      "ms": 869
+    },
+    {
+      "id": "F19",
+      "fault": "Running release degraded: a catalog-api instance is failing checks",
+      "expected": "PF17",
+      "caught": true,
+      "failed_checks": [
+        "PF17"
+      ],
+      "detail": "degraded in 3 samples: catalog-api d4d3c60f on node1: failure; ",
+      "exit_code": 3,
+      "status": "blocked",
+      "cluster_unchanged": true,
+      "clean_after": true,
+      "ms": 3302
+    },
+    {
+      "id": "F20",
+      "fault": "Database credentials variable for edge-gateway deleted",
+      "expected": "PF18",
+      "caught": true,
+      "failed_checks": [
+        "PF18"
+      ],
+      "detail": "missing db_dsn in nomad/jobs/edge-gateway: tasks would block waiting for the template",
+      "exit_code": 3,
+      "status": "blocked",
+      "cluster_unchanged": true,
+      "clean_after": true,
+      "ms": 921
+    },
+    {
+      "id": "F06",
+      "fault": "Registry unreachable",
+      "expected": "PF04",
+      "caught": true,
+      "failed_checks": [
+        "PF04"
+      ],
+      "detail": "curl: (6) Could not resolve host: registry registry http://registry:5000 is not reachable",
+      "exit_code": 3,
+      "status": "blocked",
+      "cluster_unchanged": true,
+      "clean_after": true,
+      "ms": 863
+    },
+    {
+      "id": "F07",
+      "fault": "Nomad server down",
+      "expected": "PF05",
+      "caught": true,
+      "failed_checks": [
+        "PF05"
+      ],
+      "detail": "Nomad API http://nomad-server:4646 unreachable: curl: (6) Could not resolve host: nomad-server",
+      "exit_code": 3,
+      "status": "blocked",
+      "cluster_unchanged": true,
+      "clean_after": true,
+      "ms": 692
+    },
+    {
+      "id": "F10",
+      "fault": "MySQL down",
+      "expected": "PF08",
+      "caught": true,
+      "failed_checks": [
+        "PF08"
+      ],
+      "detail": "cannot connect to mysql:3306: ERROR 2005 (HY000): Unknown MySQL server host 'mysql' (-2)",
+      "exit_code": 3,
+      "status": "blocked",
+      "cluster_unchanged": true,
+      "clean_after": true,
+      "ms": 463
+    }
+  ]
+}
