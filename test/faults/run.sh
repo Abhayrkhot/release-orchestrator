@@ -35,7 +35,9 @@ status=$(relctl status --json) || die "relctl status failed"
 CURRENT=$(jq -r .release <<<"$status")
 SVC_VERSION=$(jq -r '.services[] | select(.name == "catalog-api") | .want_version' <<<"$status")
 TARGET=$(jq -r .schema <<<"$status")
-[ -n "$CURRENT" ] && [ "$CURRENT" != null ] || die "deploy a release first"
+if [ -z "$CURRENT" ] || [ "$CURRENT" = null ]; then
+  die "deploy a release first"
+fi
 IFS=. read -r MA MI PA <<<"$CURRENT"
 NEXT="$MA.$MI.$((PA + 1))"
 log "running release $CURRENT (services $SVC_VERSION, schema $TARGET); candidate $NEXT"
